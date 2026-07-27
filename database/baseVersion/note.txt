@@ -1,0 +1,14 @@
+Update selanjutnya:
+
+- perubahan pada table room agar mendapat mengupdate status saat ini seperti sebelumnya. status: enum('reserved','available','occupied','maintenance')
+    reserved = kamar sudah dibooking untuk hari ini
+    available = kamar tersedia 
+    occupied = kamar tidak tersedia karna dihuni oleh tamu saat ini
+    occupied = kamar tidak tersedia karna sedang dalam maintanance atau perbaikan
+lebih optimal
+query lebih mudah
+
+alternative:
+    table bantu room_status
+
+masalah saat ini kurang simplecity dan flow yang terlalu rumit
