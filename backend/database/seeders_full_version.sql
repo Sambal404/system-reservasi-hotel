@@ -88,6 +88,10 @@ END //
 
 DELIMITER ;
 
+CALL GenerateDummyRooms();
+
+DROP PROCEDURE IF EXISTS GenerateDummyRooms;
+
 -- SEEDER: positions (Jabatan / Role Pegawai)
 INSERT INTO positions (id, name, description) VALUES
 (1, 'Super Admin', 'Administrator sistem TI yang mengelola hak akses dan konfigurasi sistem'),

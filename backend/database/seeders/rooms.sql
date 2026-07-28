@@ -63,3 +63,7 @@ BEGIN
 END //
 
 DELIMITER ;
+
+CALL GenerateDummyRooms();
+
+DROP PROCEDURE IF EXISTS GenerateDummyRooms;
