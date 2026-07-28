@@ -7,7 +7,7 @@ USE hotel_db;
 -- TRUNCATE TABLE positions; 
 
 
--- 1. SEEDER: positions (Jabatan / Role Pegawai)
+-- SEEDER: positions (Jabatan / Role Pegawai)
 INSERT INTO positions (id, name, description) VALUES
 (1, 'Super Admin', 'Administrator sistem TI yang mengelola hak akses dan konfigurasi sistem'),
 (2, 'General Manager', 'Manajemen eksekutif puncak yang memantau laporan analitik dan kinerja hotel'),

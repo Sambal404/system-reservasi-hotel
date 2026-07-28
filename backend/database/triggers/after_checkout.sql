@@ -1,6 +1,10 @@
 
 -- TRIGGER 1: Otomatis Kamar Kotor saat Check-Out
 
+-- ==========
+-- UNTESTED =
+-- ==========
+
 DELIMITER //
 
 CREATE TRIGGER after_checkout

@@ -16,7 +16,7 @@ USE hotel_db;
 -- ================================================================
 -- WARNING: Pastikan sudah menjalankan script room_types.sql!!  !!!
 -- ================================================================
--- 4. SEEDER: rooms (Generate 250 Kamar dengan Looping)
+-- SEEDER: rooms (Generate 250 Kamar dengan Looping)
 DELIMITER //
 
 CREATE PROCEDURE GenerateDummyRooms()

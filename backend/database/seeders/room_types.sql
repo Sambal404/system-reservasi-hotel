@@ -13,7 +13,7 @@ USE hotel_db;
 -- TRUNCATE TABLE room_types; 
 
 
--- 1. SEEDER: room_types (Kelas Kamar)
+-- SEEDER: room_types (Kelas Kamar)
 INSERT INTO room_types (id, name, base_price, description) VALUES
 (1, 'Standard Room', 450000.00, 'Kamar yang nyaman dan efisien dengan fasilitas esensial, cocok untuk pelancong bisnis atau liburan singkat.'),
 (2, 'Superior Room', 600000.00, 'Kamar yang lebih luas dengan desain interior modern, dilengkapi dengan area kerja khusus yang nyaman.'),

@@ -13,7 +13,7 @@ USE hotel_db;
 -- Hash bcrypt di bawah dari: "password123" dengan round: 12 via bcrypt-generator.com
 -- =====================================================================================================
 
--- 3. SEEDER: users (Akun Autentikasi Login)
+-- SEEDER: users (Akun Autentikasi Login)
 INSERT INTO users (id, employee_id, username, password, is_active) VALUES
 -- perbaikan pada input is_active, seharusnya awalan false.
 (1, 1, 'admin', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', TRUE),

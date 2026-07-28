@@ -8,7 +8,7 @@ USE hotel_db;
 
 -- WARNING: Pastikan sudah menjalankan script positions.sql !!
 
--- 2. SEEDER: employees (Data Profil Karyawan)
+-- SEEDER: employees (Data Profil Karyawan)
 INSERT INTO employees (id, employee_code, full_name, phone, email, position_id, status) VALUES
 (1, 'EMP-2026-001', 'Budi Hermawan, S.Kom', '081234567801', 'budi.admin@hotel.com', 1, 'active'),
 (2, 'EMP-2026-002', 'Hendra Wijaya', '081234567802', 'hendra.gm@hotel.com', 2, 'active'),
