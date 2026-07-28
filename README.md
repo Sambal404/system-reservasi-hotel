@@ -1,275 +1,157 @@
-# System-Reservasi-Hotel
 
-Aplikasi web internal untuk membantu **Staf Front Office** mengelola data tamu, pemesanan kamar (reservasi), *check-in*, *check-out*, serta memantau ketersediaan kamar secara *real-time* di **Grand Nusantara Hotel**.
+# 🏨 Sistem Reservasi Hotel (Grand Nusantara Hotel)
 
-Proyek ini merupakan bagian dari **Project Kelompok A**, yang terhubung dengan sistem housekeeping milik **Kelompok B** melalui database sebagai satu sumber data status kamar yang sama.
-
----
-
-## 📌 Fungsi Aplikasi
-
-| Fitur | Deskripsi |
-| --- | --- |
-| **Login** | Autentikasi staf Front Office atau Admin menggunakan JWT |
-| **Dashboard / Overview** | Ringkasan status kamar saat ini, total reservasi aktif, serta statistik tamu harian |
-| **Data Tamu** | Kelola informasi profil dan kontak tamu hotel |
-| **Manajemen Reservasi** | Pembuatan, perubahan, dan pembatalan pesanan kamar oleh tamu |
-| **Check-In & Check-Out** | Proses kedatangan dan kepulangan tamu yang langsung memperbarui status kamar |
-| **Status Kamar** | Melihat ketersediaan kamar secara *real-time* (Available / Terisi / Maintenance) |
-| **Pencarian** | Pencarian cepat data reservasi atau tamu dari sidebar |
-
-Saat status kamar berubah karena *check-in* atau *check-out*, **status kamar tersinkron otomatis** dengan Aplikasi housekeeping kelompok B — tidak perlu update manual di dua tempat berbeda.
+Repositori utama untuk aplikasi **Front Office Management Sistem Reservasi Hotel** yang dikembangkan oleh **Kelompok A** untuk kegiatan OJT. Sistem ini dirancang untuk menangani operasional front office secara menyeluruh mulai dari manajemen kamar, reservasi, proses *check-in*, *check-out*, hingga pencatatan pembayaran.
 
 ---
 
-## 🛠️ Teknologi yang Digunakan
+## 🏗️ Struktur Proyek & Tech Stack
 
-| Layer | Teknologi |
-| --- | --- |
-| **Backend** | Node.js + **Express.js**, MySQL (`mysql2`), JWT untuk autentikasi, bcryptjs untuk hashing password |
-| **Frontend** | **React** (Vite), React Router, Axios untuk konsumsi REST API |
-| **Database** | MySQL / MariaDB |
+Proyek ini menggunakan arsitektur monorepo terpisah antara *backend* dan *frontend* dengan database relasional MySQL:
 
----
-
-## 📁 Struktur Repository
+* **Backend:** Node.js, Express, MySQL (`/backend`)
+* **Frontend:** React (`/frontend`)
+* **Database:** MySQL (`/backend/database`)
 
 ```
-System-Reservasi-Hotel/
-│
-├── server-side/                         # Backend (Express)
-│   ├── node_modules/
-│   ├── config/
-│   │   └── db.js                        # koneksi ke MySQL
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── guestController.js
-│   │   ├── reservationController.js
-│   │   └── roomController.js
-│   ├── middleware/
-│   │   ├── auth.js                      # verifikasi JWT & role
-│   │   └── errorHandler.js              # penanganan error terpusat
-│   ├── routes/
-│   │   ├── authRoutes.js
-│   │   ├── guestRoutes.js
-│   │   ├── reservationRoutes.js
-│   │   └── roomRoutes.js
-│   ├── database/
-│   │   └── schema.sql                   # struktur tabel + data contoh
-│   ├── .env                             # tidak ikut di-push ke GitHub
-│   ├── .gitignore
-│   ├── package.json
-│   ├── package-lock.json
-│   └── server.js                        # entry point: setup Express + jalankan server
-│
-└── react-frontend/                      # Frontend (React)
-    ├── public/                          # favicon ...
-    ├── src/
-    │   ├── assets/                      
-    │   ├── pages/                       # Login, Dashboard, Guests, Reservations, Rooms
-    │   ├── components/
-    │   ├── services/                    # axios instance & pemanggilan API
-    │   └── App.jsx
-    ├── index.html
-    ├── .env.example
-    └── package.json
+
+system-reservasi-hotel/
+├── backend/         # API & Server Node.js (CommonJS, Express)
+└──  frontend/        # Antarmuka Pengguna React
 
 ```
 
 ---
 
-## 🚀 Cara Menggunakan Repo (Mulai dari Fork)
+## 📌 Fitur Utama Sistem
 
-Panduan ini untuk anggota tim/kontributor baru yang ingin mulai berkontribusi dari nol.
+* **Front Office Management:** Dashboard pemantauan status kamar secara real-time.
+* **Reservasi Kamar:** Pengelolaan data tamu, pemilihan tipe kamar, dan penjadwalan.
+* **Check-In & Check-Out:** Alur proses kedatangan dan kepulangan tamu hotel.
+  
+---
 
-### 1. Fork repository
+## 👥 Panduan Kolaborasi Tim & Penggunaan Branch (Khusus Pemula)
 
-1. Buka halaman repository **Sistem-Reservasi-Hotel** ini di GitHub.
-2. Klik tombol **Fork** di pojok kanan atas → pilih akun GitHub kamu sebagai tujuan fork.
-3. Setelah selesai, kamu akan punya salinan repo ini di akun GitHub-mu sendiri, misalnya:
-`[https://github.com/](https://github.com/)<username-kamu>/Sistem-Reservasi-Hotel`
+Karena repositori ini menggunakan sistem **Git Collaborator** dan banyak anggota tim yang masih pemula, **dilarang keras langsung melakukan perubahan (*commit/push*) ke branch `main**`. Kita wajib menggunakan *Branch* terpisah untuk setiap fitur agar kode utama tetap aman dan tidak mudah rusak (*conflict*).
 
-### 2. Clone hasil fork ke komputer lokal
+### 1. Aturan Dasar Branch
 
-```bash
-git clone https://github.com/<username-kamu>/Sistem-Reservasi-Hotel.git
-cd Sistem-Reservasi-Hotel
+* **`main`**: Branch utama yang bersih, stabil, dan siap jalan. Tidak boleh ada yang *coding* langsung di sini.
+* **Feature Branch**: Branch turunan yang wajib dibuat setiap kali Anda ingin mengerjakan tugas/fitur baru.
 
-```
+---
 
-### 3. Hubungkan ke repo asli (upstream)
+### 2. Panduan Langkah-Langkah Menggunakan Branch (Step-by-Step)
 
-Supaya kamu bisa menarik update terbaru dari repo tim:
+Ikuti alur kerja ini setiap kali Anda akan mulai mengerjakan tugas baru:
 
-```bash
-git remote add upstream https://github.com/Sambal404/Sistem-Reservasi-Hotel.git
-git remote -v
+#### A. Ambil Update Terbaru dari `main`
 
-```
-
-### 4. Siapkan database
-
-1. Buat database MySQL baru:
-```sql
-CREATE DATABASE grand_nusantara_hotel;
-
-```
-
-
-2. Import skema dan data contoh:
-```bash
-mysql -u root -p grand_nusantara_hotel < server-side/database/schema.sql
-
-```
-
-
-
-### 5. Jalankan Backend (server-side)
-
-```bash
-cd server-side
-npm install
-
-```
-
-Buat file `.env` di dalam folder `server-side/` (belum ada di repo karena di-`.gitignore`), isinya:
-
-```
-PORT=5000
-DB_HOST=localhost
-DB_PORT=3306
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=grand_nusantara_hotel
-JWT_SECRET=ganti_dengan_string_acak_yang_panjang
-JWT_EXPIRES_IN=8h
-CORS_ORIGIN=http://localhost:5173
-
-```
-
-Jalankan server:
-
-```bash
-npm run dev
-
-```
-
-Backend akan berjalan di `http://localhost:5000`. Cek apakah sudah aktif lewat:
-
-```bash
-curl http://localhost:5000/api/health
-
-```
-
-### 6. Jalankan Frontend (react-frontend)
-
-Buka terminal baru:
-
-```bash
-cd react-frontend
-npm install
-cp .env.example .env
-
-```
-
-Pastikan `.env` frontend mengarah ke URL backend:
-
-```
-VITE_API_BASE_URL=http://localhost:5000/api
-
-```
-
-Jalankan aplikasi:
-
-```bash
-npm run dev
-
-```
-
-Frontend akan berjalan di `http://localhost:5173` (default Vite).
-
-### 7. Login dengan akun contoh
-
-Gunakan salah satu akun dari data contoh di `schema.sql`:
-
-| Username | Password | Role |
-| --- | --- | --- |
-| `frontoffice01` | `hashed_pw` | Front Office Staff |
-
-> ⚠️ Password di data contoh masih plaintext untuk kemudahan testing lokal. **Jangan pernah dipakai di lingkungan production** — ganti dengan password yang di-hash menggunakan bcrypt sebelum deploy.
-
-### 8. Membuat perubahan & mengirim Pull Request
-
-1. Buat branch baru untuk fitur/perbaikan yang kamu kerjakan:
-```bash
-git checkout -b fitur/nama-fiturmu
-
-```
-
-
-2. Lakukan perubahan, lalu commit:
-```bash
-git add .
-git commit -m "Menambahkan fitur ..."
-
-```
-
-
-3. Push ke fork kamu:
-```bash
-git push origin fitur/nama-fiturmu
-
-```
-
-
-4. Buka GitHub → repo fork kamu → klik **Compare & pull request** → arahkan ke branch `main` di repo asli tim.
-5. Tulis deskripsi perubahan yang jelas, lalu submit PR untuk di-review anggota tim lain.
-
-### 9. Menyinkronkan fork dengan update terbaru dari tim
-
-Sebelum mulai kerjakan fitur baru, selalu tarik update terbaru dulu:
+Sebelum membuat branch baru, pastikan posisi Anda di branch `main` dan ambil kode terbaru:
 
 ```bash
 git checkout main
-git fetch upstream
-git merge upstream/main
-git push origin main
+git pull origin main
 
 ```
+
+#### B. Buat Branch Baru untuk Fitur Anda
+
+Buat branch dengan nama yang merepresentasikan tugas Anda (gunakan format: `fitur/nama-fitur` atau `fix/nama-bug`):
+
+```bash
+# Contoh membuat branch untuk fitur reservasi:
+git checkout -b fitur/reservasi-kamar
+
+```
+
+*(Perintah `-b` otomatis membuat branch baru sekaligus memindahkan Anda ke branch tersebut).*
+
+#### C. Lakukan Perubahan & Commit Sering-Sering
+
+Kerjakan kodingan Anda di dalam branch tersebut. Jika sudah selesai bagian tertentu, simpan (*commit*) dengan pesan yang jelas:
+
+```bash
+git add .
+git commit -m "feat: add reservation form validation"
+
+```
+
+#### D. Kirim Branch ke GitHub (Push)
+
+Kirim branch buatan Anda ke server GitHub agar bisa direview oleh tim:
+
+```bash
+git push origin fitur/reservasi-kamar
+
+```
+
+#### E. Menggabungkan Kode ke `main` (Merge via Pull Request / Kolaborasi)
+
+1. Buka repository GitHub di browser.
+2. Anda akan melihat tombol hijau **"Compare & pull request"**. Klik tombol tersebut.
+3. Buat *Pull Request* (PR) untuk menggabungkan branch Anda ke branch `main`.
+4. Diskusikan atau minta rekan tim (*collaborator*) untuk memeriksa kode Anda sebelum ditekan tombol **Merge**.
 
 ---
 
-## 📡 Ringkasan Endpoint API
+### 3. Standar Penulisan Pesan Commit (Commit Message)
 
-| Method | Endpoint | Deskripsi | Auth |
-| --- | --- | --- | --- |
-| POST | `/api/auth/login` | Login staf front office | ❌ |
-| GET | `/api/auth/me` | Profil staf yang sedang login | ✅ |
-| GET | `/api/guests` | Daftar data tamu hotel | ✅ |
-| POST | `/api/guests` | Tambah data tamu baru | ✅ |
-| GET | `/api/reservations` | Daftar seluruh transaksi reservasi | ✅ |
-| POST | `/api/reservations` | Buat pemesanan/reservasi baru | ✅ |
-| PUT | `/api/reservations/:id/checkin` | Proses check-in tamu | ✅ |
-| PUT | `/api/reservations/:id/checkout` | Proses check-out tamu | ✅ |
-| PUT | `/api/reservations/:id/cancel` | Batalkan reservasi | ✅ |
-| GET | `/api/rooms` | Daftar kamar dan status ketersediaan | ✅ |
+Gunakan format commit yang jelas berdasarkan jenis perubahan agar mudah dibaca oleh tim:
 
-Semua endpoint yang butuh login mengharuskan header:
+* `feat: [nama_fitur]` — Untuk penambahan fitur baru (contoh: `feat: add check-in API endpoint`)
+* `fix: [deskripsi_bug]` — Untuk perbaikan *bug* atau error (contoh: `fix: resolve room status calculation bug`)
+* `style: [deskripsi]` — Untuk perubahan tampilan, CSS, atau format kode tanpa mengubah logika
+* `chore: [deskripsi]` — Untuk pemeliharaan file konfigurasi, dependensi, atau penambahan file README
+
+---
+
+## ⚙️ Panduan Singkat Menjalankan Proyek
+
+### 1. Konfigurasi Database
+
+* Masuk ke folder `database/`, jalankan file `init.sql` lalu `seeders_full_version.sql` pada MySQL Anda untuk menyiapkan database `hotel_db`.
+
+### 2. Menjalankan Backend (`/backend`)
+
+1. Masuk ke folder backend: `cd backend`
+2. Buat file `.env` (sesuaikan dengan `.env-example` yang ada).
+3. Install dependensi dan jalankan server:
+```bash
+npm install
+npm run dev
 
 ```
-Authorization: Bearer <token>
+
+
+
+### 3. Menjalankan Frontend (`/frontend`)
+
+1. Masuk ke folder frontend: `cd frontend`
+2. Install dependensi dan jalankan *development server*:
+```bash
+npm install
+npm run dev
 
 ```
 
+
+
+```
+
+```
 ---
 
 ## 👥 Tim
 
 Project Kelompok A — Sistem Reservasi Hotel
- - 
 
-## 📄 Lisensi
+*
 
+
+
+---
 Proyek ini dibuat untuk keperluan tugas akademik.
 
 
