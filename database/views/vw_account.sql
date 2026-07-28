@@ -1,19 +1,24 @@
--- view untuk digunakan login
+-- Digunakan untuk login
 
-CREATE VIEW vw_account AS
-SELECT
+CREATE OR REPLACE VIEW vw_account AS
+SELECT 
+    u.id AS user_id,
     u.username,
-    u.password,
-    e.status as employee_status,
-    a.name as application_name,
-    au.role as application_role
-
-FROM users u
-JOIN employees e
-    ON u.employee_id = e.id
-JOIN application_users au
-    ON au.user_id = u.id
-JOIN applications a
-    ON au.application_id = a.id;
+    u.password, -- Backend butuh ini untuk mengecek validitas password (bcrypt)
+    e.full_name AS employee_name,
+    p.name AS employee_position,
     
--- DONE FINAL
+    -- Menggabungkan data multi-aplikasi menjadi bentuk JSON Array langsung di Database!
+    JSON_ARRAYAGG(
+        JSON_OBJECT(
+            'app_name', app.name,
+            'role', au.role 
+        )
+    ) AS access_rights
+FROM users u
+JOIN employees e ON u.employee_id = e.id
+JOIN positions p ON e.position_id = p.id
+JOIN application_users au ON u.id = au.user_id
+JOIN applications app ON au.application_id = app.id
+WHERE u.is_active = TRUE
+GROUP BY u.id;

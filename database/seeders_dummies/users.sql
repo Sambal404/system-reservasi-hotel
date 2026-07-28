@@ -16,11 +16,11 @@ USE hotel_db;
 -- 3. SEEDER: users (Akun Autentikasi Login)
 INSERT INTO users (id, employee_id, username, password, is_active) VALUES
 -- perbaikan pada input is_active, seharusnya awalan false.
-(1, 1, 'admin', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', FALSE),
-(2, 2, 'gm_hendra', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', FALSE),
-(3, 3, 'fom_siti', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', FALSE),
-(4, 4, 'fo_dewi', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', FALSE),
-(5, 5, 'fo_rizky', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', FALSE),
-(6, 6, 'hk_agus', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', FALSE),
-(7, 7, 'hk_bambang', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', FALSE),
-(8, 8, 'finance_maya', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', FALSE);
+(1, 1, 'admin', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', TRUE),
+(2, 2, 'gm_hendra', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', TRUE),
+(3, 3, 'fom_siti', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', TRUE),
+(4, 4, 'fo_dewi', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', TRUE),
+(5, 5, 'fo_rizky', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', TRUE),
+(6, 6, 'hk_agus', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', TRUE),
+(7, 7, 'hk_bambang', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', TRUE),
+(8, 8, 'finance_maya', '$2a$12$WFrbN4/GRt4fKQqFDIbgiORJUgb1XADP3.7LUmhFS04WNgkVg3vCK', TRUE);
