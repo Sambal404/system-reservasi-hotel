@@ -23,6 +23,7 @@ Buat file bernama `.env` di root direktori backend Anda dengan merujuk pada cont
 ```env
 # APP CONFIG
 NODE_ENV=development
+APP_NAME="Front Office POS"
 PORT=3000
 
 # DATABASE
