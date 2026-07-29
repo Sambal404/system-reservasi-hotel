@@ -4,7 +4,7 @@ use hotel_db;
 
 DELIMITER //
 
-CREATE TRIGGER after_room_check_in
+CREATE TRIGGER trg_after_checked_in
 AFTER UPDATE ON reservation_rooms
 FOR EACH ROW
 BEGIN

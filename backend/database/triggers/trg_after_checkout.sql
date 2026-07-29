@@ -3,7 +3,7 @@ use hotel_db
 
 DELIMITER //
 
-CREATE TRIGGER trg_after_checkout
+CREATE TRIGGER trg_after_checked_out
 AFTER UPDATE ON reservation_rooms
 FOR EACH ROW
 BEGIN

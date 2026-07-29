@@ -1,15 +1,15 @@
--- TRIGGER AFTER CANCEL
+-- TRIGGER AFTER CANCEL RESERVATIONS
 
 use hotel_db;
 
 DELIMITER //
 
-CREATE TRIGGER trg_room_status_on_cancelled
+CREATE TRIGGER trg_after_canceled
 AFTER UPDATE ON reservation_rooms
 FOR EACH ROW
 BEGIN
     -- Cek jika status berubah menjadi 'cancelled' dan status sebelumnya bukan 'cancelled'
-    IF OLD.status != 'cancelled' AND NEW.status = 'cancelled' THEN
+    IF OLD.status != 'canceled' AND NEW.status = 'canceled' THEN
         
         -- Cek apakah tanggal check_in yang dijadwalkan adalah hari ini?
         IF NEW.check_in_date = CURDATE() THEN
