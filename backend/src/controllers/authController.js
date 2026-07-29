@@ -9,12 +9,12 @@ const db = require("../config/db");
 
 exports.login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, applicationName } = req.body;
 
-    if (!username || !password) {
-      return res
-        .status(400)
-        .json({ message: "Username dan password wajib diisi" });
+    if (!username || !password || !applicationName) {
+      return res.status(400).json({
+        message: "Username, password, dan applicationName wajib diisi",
+      });
     }
 
     const query = `
@@ -27,19 +27,28 @@ exports.login = async (req, res) => {
         e.full_name,
         e.email,
         e.position_id,
-        e.status AS employee_status
+        e.status AS employee_status,
+        p.name AS employee_position,
+        app.id AS application_id,
+        app.name AS application_name,
+        au.role
       FROM users u
       JOIN employees e ON u.employee_id = e.id
-      WHERE u.username = ?
+      JOIN positions p ON e.position_id = p.id
+      JOIN application_users au ON u.id = au.user_id
+      JOIN applications app ON au.application_id = app.id
+      WHERE
+        u.is_active = TRUE AND
+        u.username = ? AND
+        app.name = ?
       LIMIT 1
     `;
 
-    const [rows] = await db.execute(query, [username]);
-    const user = rows[0];
-
-    if (!user) {
-      return res.status(401).json({ message: "Username atau password salah" });
+    const [rows] = await db.execute(query, [username, applicationName]);
+    if (!rows[0]) {
+      return res.status(401).json({ success: false, message: "Login gagal" });
     }
+    const user = rows[0];
 
     const isPasswordValid = await bcrypt.compare(
       password,
@@ -65,32 +74,6 @@ exports.login = async (req, res) => {
       return res.status(403).json({ success: false, message: msg });
     }
 
-    const { applicationId } = req.body;
-    if (!applicationId) {
-      return res.status(400).json({ message: "Application Id wajib diisi" });
-    }
-
-    const accessQuery = `
-    SELECT au.role, a.name AS application_name
-    FROM application_users au
-    JOIN applications a ON au.application_id = a.id
-    WHERE au.user_id = ? AND au.application_id = ?
-    LIMIT 1
-`;
-
-    const [accessRows] = await db.execute(accessQuery, [
-      user.user_id,
-      applicationId,
-    ]);
-
-    if (!accessRows[0]) {
-      return res
-        .status(403)
-        .json({ success: false, message: "Akses aplikasi tidak diizinkan" });
-    }
-
-    const appAccess = accessRows[0];
-
     await db.execute(
       "UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = ?",
       [user.user_id],
@@ -101,15 +84,16 @@ exports.login = async (req, res) => {
       employeeId: user.employee_id,
       fullName: user.full_name,
       positionId: user.position_id,
-      applicationId,
-      role: appAccess.role,
+      applicationId: user.application_id,
+      applicationName: user.application_name,
+      role: user.role,
     };
 
     const token = jwt.sign(
       payload,
       process.env.JWT_SECRET || "secret_key_sementara",
       {
-        expiresIn: "2h",
+        expiresIn: "8h",
       },
     );
 
