@@ -1,7 +1,8 @@
 
 # 🏨 Reservasi Grand Nusantara Hotel - Backend
 
-Backend API untuk aplikasi Reservasi Grand Nusantara Hotel yang dibangun menggunakan **Node.js**, **Express**, dan **MySQL**. Proyek ini dikembangkan oleh **Kelompok A** untuk kegiatan OJT.
+Backend API untuk aplikasi Reservasi Grand Nusantara Hotel yang dibangun menggunakan **Node.js**, **Express**, dan **MySQL**. Proyek ini dikembangkan oleh **Kelompok A** untuk kegiatan OJT. Selengkapnya dapat dilihat di [Wiki project kami](https://github.com/Sambal404/system-reservasi-hotel/wiki) untuk penjelasan lengkap detail proyek.
+
 
 ---
 
