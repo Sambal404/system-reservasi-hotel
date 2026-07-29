@@ -8,9 +8,6 @@ const authRoutes = require('./src/routes/authRoutes');
 dotenv.config();
 
 const app = express();
-app.use(express.json());
-const authRoutes = require("./src/routes/authRoutes");
-app.use("/api/auth", authRoutes);
 
 app.use(cors()); // buka untuk semua
 app.use(express.json());
