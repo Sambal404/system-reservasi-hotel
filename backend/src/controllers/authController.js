@@ -34,6 +34,14 @@ const login = async (req, res) => {
         // 3. Cek Hak Akses Aplikasi Backend
         const myApp = process.env.APP_NAME || 'Front Office POS';
         
+        let accesRights = user.access_rights;
+        if (typeof accesRights === 'string'){
+            try{
+                accesRights = JSON.parse(accesRights);
+            }catch (e){
+                accesRights = [];
+            }
+        }
         const allowed = Array.isArray(user.access_rights) && 
             user.access_rights.some(access => access.app_name === myApp);
 
