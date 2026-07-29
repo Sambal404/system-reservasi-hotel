@@ -74,11 +74,6 @@ exports.login = async (req, res) => {
       return res.status(403).json({ success: false, message: msg });
     }
 
-    await db.execute(
-      "UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-      [user.user_id],
-    );
-
     const payload = {
       userId: user.user_id,
       employeeId: user.employee_id,
