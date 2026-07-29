@@ -2,6 +2,8 @@
 --  DATABASE HOTEL ===
 -- =============== ===
 
+DROP DATABASE IF EXISTS hotel_db;
+
 CREATE DATABASE IF NOT EXISTS hotel_db;
 USE hotel_db;
 
@@ -42,7 +44,8 @@ CREATE TABLE IF NOT EXISTS users (
     -- (saat sistem mengupdate sesi/token login, kolom ini akan otomatis berubah)
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     -- Jika data pegawai dihapus, akun loginnya otomatis terhapus
-    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE
+    FOREIGN KEY (employee_id) REFERENCES employees(id) ON DELETE CASCADE,
+    INDEX idx_users_is_active (is_active)
 );
 -- 4. MASTER TABLE: applications (Daftar Aplikasi Sistem)
 CREATE TABLE IF NOT EXISTS applications (
@@ -80,10 +83,11 @@ CREATE TABLE IF NOT EXISTS rooms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     room_type_id INT NOT NULL,
     room_number VARCHAR(10) NOT NULL UNIQUE,
-    status ENUM('available','reserved','occupied','maintenance') DEFAULT 'available', 
+    status ENUM('available','occupied','maintenance') DEFAULT 'available', 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (room_type_id) REFERENCES room_types(id) ON DELETE RESTRICT
+    FOREIGN KEY (room_type_id) REFERENCES room_types(id) ON DELETE RESTRICT,
+    INDEX idx_rooms_status (status)
 );
 
 -- 8. MASTER TABLE: amenities (Daftar Fasilitas)
@@ -121,7 +125,9 @@ CREATE TABLE IF NOT EXISTS guests (
     phone VARCHAR(20) NOT NULL,
     email VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    INDEX idx_guests_name (name),
+    INDEX idx_guests_phone (phone)
 );
 
 
@@ -135,13 +141,17 @@ CREATE TABLE IF NOT EXISTS reservations (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (guest_id) REFERENCES guests(id) ON DELETE RESTRICT,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
+    INDEX idx_reservations_status (status),
+    INDEX idx_reservations_guest (guest_id),
+    INDEX idx_reservations_created (created_at)
 );
 -- 2. DETAIL TABLE: reservation_rooms (Kamar yang Dipesan)
 CREATE TABLE IF NOT EXISTS reservation_rooms (
     id INT AUTO_INCREMENT PRIMARY KEY,
     reservation_id INT NOT NULL,
-    room_id INT NOT NULL,
+    room_type_id INT NOT NULL,
+    room_id INT NULL,
     price_per_night DECIMAL(10,2) NOT NULL, -- Harga snapshot saat pesanan dibuat 
     -- Jumlah tamu yang menempati kamar
     total_adults INT DEFAULT 1,
@@ -157,11 +167,14 @@ CREATE TABLE IF NOT EXISTS reservation_rooms (
     check_out_by INT NULL, 
     
     FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE CASCADE,
+    FOREIGN KEY (room_type_id) REFERENCES room_types(id) ON DELETE RESTRICT,
     FOREIGN KEY (room_id) REFERENCES rooms(id) ON DELETE RESTRICT,
     FOREIGN KEY (check_in_by) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (check_out_by) REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT chk_dates CHECK (check_out_date > check_in_date),
-    INDEX idx_room_availability (room_id, room_status, check_in_date, check_out_date)
+    INDEX idx_res_rooms_status (room_status),
+    INDEX idx_res_rooms_dates (check_in_date, check_out_date),
+    INDEX idx_res_rooms_room_dates (room_id, check_in_date, check_out_date)
 );
 -- 3. TRANSACTION TABLE: payments (Uang Masuk)
 CREATE TABLE IF NOT EXISTS payments (
@@ -174,7 +187,9 @@ CREATE TABLE IF NOT EXISTS payments (
     reference_number VARCHAR(100), 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE RESTRICT,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE RESTRICT,
+    INDEX idx_payments_method (payment_method),
+    INDEX idx_payments_type (payment_type)
 );
 -- 4. TRANSACTION TABLE: refunds (Uang Keluar / Pengembalian)
 CREATE TABLE IF NOT EXISTS refunds (
