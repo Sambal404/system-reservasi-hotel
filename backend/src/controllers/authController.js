@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
 
+const applicationName = process.env.APP_NAME || 'Front Office POS';
 /**
  * Fitur login auth karyawan
  * POST /api/auth/login
@@ -9,13 +10,8 @@ const db = require("../config/db");
 
 exports.login = async (req, res) => {
   try {
-    const { username, password, applicationName } = req.body;
-
-    if (!username || !password || !applicationName) {
-      return res.status(400).json({
-        message: "Username, password, dan applicationName wajib diisi",
-      });
-    }
+    
+    const { username, password } = req.body;
 
     const query = `
       SELECT
@@ -27,7 +23,6 @@ exports.login = async (req, res) => {
         e.full_name,
         e.email,
         e.position_id,
-        e.status AS employee_status,
         p.name AS employee_position,
         app.id AS application_id,
         app.name AS application_name,
@@ -38,7 +33,6 @@ exports.login = async (req, res) => {
       JOIN application_users au ON u.id = au.user_id
       JOIN applications app ON au.application_id = app.id
       WHERE
-        u.is_active = TRUE AND
         u.username = ? AND
         app.name = ?
       LIMIT 1
@@ -61,18 +55,19 @@ exports.login = async (req, res) => {
     if (!user.is_user_active) {
       return res.status(403).json({
         success: false,
-        message: "Akun anda belum aktif. Silahkan hubungi admin",
+        message: "Akun anda nonaktif. Silahkan hubungi admin",
       });
     }
 
-    if (user.employee_status !== "active") {
-      const msg =
-        user.employee_status === "resigned"
-          ? "Akses ditolak. Status pegawai sudah Resigned"
-          : "Akses ditolak. Status kepegawaian tidak aktif.";
+    // tidak diperlukan, employee_status untuk HR kelola
+    // if (user.employee_status !== "active") {
+    //   const msg =
+    //     user.employee_status === "resigned"
+    //       ? "Akses ditolak. Status pegawai sudah Resigned"
+    //       : "Akses ditolak. Status kepegawaian tidak aktif.";
 
-      return res.status(403).json({ success: false, message: msg });
-    }
+    //   return res.status(403).json({ success: false, message: msg });
+    // }
 
     const payload = {
       userId: user.user_id,
@@ -88,7 +83,7 @@ exports.login = async (req, res) => {
       payload,
       process.env.JWT_SECRET || "secret_key_sementara",
       {
-        expiresIn: "8h",
+        expiresIn: "9h", // 9h = 8h shift + 1 hour toleransi untuk transisi
       },
     );
 
@@ -102,7 +97,8 @@ exports.login = async (req, res) => {
           username: user.username,
           fullName: user.full_name,
           email: user.email,
-          positionId: user.position_id,
+          positionName: user.position_name,
+          role: user.role,
         },
       },
     });
