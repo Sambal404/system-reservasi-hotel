@@ -65,6 +65,32 @@ exports.login = async (req, res) => {
       return res.status(403).json({ success: false, message: msg });
     }
 
+    const { applicationId } = req.body;
+    if (!applicationId) {
+      return res.status(400).json({ message: "Application Id wajib diisi" });
+    }
+
+    const accessQuery = `
+    SELECT au.role, a.name AS application_name
+    FROM application_users au
+    JOIN applications a ON au.application_id = a.id
+    WHERE au.user_id = ? AND au.application_id = ?
+    LIMIT 1
+`;
+
+    const [accessRows] = await db.execute(accessQuery, [
+      user.user_id,
+      applicationId,
+    ]);
+
+    if (!accessRows[0]) {
+      return res
+        .status(403)
+        .json({ success: false, message: "Akses aplikasi tidak diizinkan" });
+    }
+
+    const appAccess = accessRows[0];
+
     await db.execute(
       "UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE id = ?",
       [user.user_id],
@@ -75,6 +101,8 @@ exports.login = async (req, res) => {
       employeeId: user.employee_id,
       fullName: user.full_name,
       positionId: user.position_id,
+      applicationId,
+      role: appAccess.role,
     };
 
     const token = jwt.sign(
