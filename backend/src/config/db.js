@@ -1,5 +1,6 @@
-const mysql = require("mysql2/promise");
-const dotenv = require("dotenv");
+const mysql = require('mysql2/promise');
+const dotenv = require('dotenv');
+
 dotenv.config();
 // Validasi isi dari .env
 const requiredEnv = ["DB_HOST", "DB_USER", "DB_NAME", "DB_PASSWORD"];
