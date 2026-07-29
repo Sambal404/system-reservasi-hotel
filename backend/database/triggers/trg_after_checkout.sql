@@ -12,8 +12,7 @@ BEGIN
         UPDATE rooms
         -- Ubah status kamar menjadi tersedia/available dan kondisi kotor/dirty
         SET status = 'available', 
-            clean_status = 'dirty', 
-            updated_at = CURRENT_TIMESTAMP
+            clean_status = 'dirty'
         WHERE id = NEW.room_id;  -- NEW.room_id adalah room_id dari row reservation_rooms yang terupdate
     END IF;
 END //
