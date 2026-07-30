@@ -21,10 +21,11 @@ function SideBar() {
     return (
         <aside className="w-2/12 h-screen bg-[#07111e] flex flex-col justify-between py-6 fixed left-0 top-0 text-white z-20">
             <div>
+                {/* Logo ala kadar nya */}
                 <div className="mb-8 text-center px-4">
                     <div className="w-10 h-10 bg-[#C5A059] rounded-full flex items-center justify-center mx-auto mb-2 text-sm font-bold text-[#07111E]">
                     ✦
-                    </div>
+                    </div> 
                     <h1 className="text-[11px] tracking-widest font-serif text-[#C5A059]">GRAND NUSANTARA</h1>
                     <p className="text-[9px] tracking-widest text-[#C5A059]">HOTEL ✩✩✩✩✩</p>
                 </div>
@@ -60,7 +61,8 @@ function SideBar() {
 
             {/* Logout Button */}
             <div className="px-3">
-                <NavLink to="/logout" className={navLinkClass}>
+                {/* Next Ganti Button open window confirmation Signout */}
+                <NavLink to="/logout" className={navLinkClass}> 
                     <LogOut size={18} /> Sign Out
                 </NavLink>
             </div>

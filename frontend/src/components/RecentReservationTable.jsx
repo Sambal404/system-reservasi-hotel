@@ -1,7 +1,7 @@
 // src/components/RecentReservationTable.jsx
 import { useState } from 'react';
 
-export default function RecentReservationTable({ reservations = [] }) {
+function RecentReservationTable({ reservations = [] }) {
   const [expandedRows, setExpandedRows] = useState({});
   const [isExpandedFull, setIsExpandedFull] = useState(false); // State untuk memperluas modul
 
@@ -140,3 +140,5 @@ export default function RecentReservationTable({ reservations = [] }) {
     </div>
   );
 }
+
+export default RecentReservationTable;

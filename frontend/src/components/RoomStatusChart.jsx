@@ -7,7 +7,7 @@ const data = [
   { name: 'Maintenance', value: 12, color: '#f59e0b' },   // Kuning/Oranye (Amber)
 ];
 
-export default function RoomStatusChart() {
+function RoomStatusChart() {
   return (
     <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
       <h3 className="text-xs font-bold text-slate-800 mb-2">Status Kamar</h3>
@@ -58,3 +58,5 @@ export default function RoomStatusChart() {
     </div>
   );
 }
+
+export default RoomStatusChart;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+// Components
 import StatCard from '../components/StatCard';
 import ReservationChart from '../components/ReservationChart';
 import RoomStatusChart from '../components/RoomStatusChart';
@@ -170,3 +171,5 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
+// Lanjut Besok

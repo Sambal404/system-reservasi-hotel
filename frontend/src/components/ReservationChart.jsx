@@ -11,7 +11,7 @@ const data = [
   { day: '21 Mei', reservasi: 33, checkin: 15 },
 ];
 
-export default function ReservationChart() {
+function ReservationChart() {
   return (
     <div className="col-span-2 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
       {/* Header & Legenda */}
@@ -61,3 +61,5 @@ export default function ReservationChart() {
     </div>
   );
 }
+
+export default ReservationChart;

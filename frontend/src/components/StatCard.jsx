@@ -1,5 +1,5 @@
 // src/components/StatCard.jsx
-export default function StatCard({ title, value, subtext, icon, subtextColor = "text-slate-400", iconBg = "bg-blue-50 text-blue-600" }) {
+function StatCard({ title, value, subtext, icon, subtextColor = "text-slate-400", iconBg = "bg-blue-50 text-blue-600" }) {
   return (
     <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex justify-between items-center">
       <div>
@@ -13,3 +13,5 @@ export default function StatCard({ title, value, subtext, icon, subtextColor = "
     </div>
   );
 }
+
+export default StatCard;
