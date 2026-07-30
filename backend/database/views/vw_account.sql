@@ -1,5 +1,7 @@
 -- Digunakan untuk login
 
+use hotel_db;
+
 CREATE OR REPLACE VIEW vw_account AS
 SELECT 
     u.id AS user_id,
