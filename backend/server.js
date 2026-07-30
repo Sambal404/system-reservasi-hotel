@@ -3,7 +3,10 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+
+// ROUTES
 const authRoutes = require('./src/routes/authRoutes');
+const dashboardRoutes = require('./src/routes/dashboardRoutes')
 
 dotenv.config();
 
@@ -16,6 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 // Auth routes
 app.use('/api/auth', authRoutes);
 
+// Dashboard routes
+app.use('/api/dashboard', dashboardRoutes);
 
 
 // basic error handler
