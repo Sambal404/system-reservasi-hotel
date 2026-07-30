@@ -104,8 +104,8 @@ const getDashboardData = async (req, res) => {
         return res.status(200).json({
             success: true,
             data: {
-                rooms: roomSummary[0],
-                operations: opsSummary[0],
+                room_summary: roomSummary[0],
+                reservation_summary: reservationSummary[0],
                 recent_reservations: recentReservations
             }
         });
