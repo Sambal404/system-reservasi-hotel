@@ -185,7 +185,7 @@ CREATE TABLE IF NOT EXISTS payments (
     user_id INT NOT NULL, -- Kasir yang menerima uang
     amount DECIMAL(12, 2) NOT NULL, -- Pasti bernilai positif
     payment_method ENUM('cash', 'debit_card', 'credit_card', 'transfer', 'qris') NOT NULL, 
-    payment_type ENUM('down_payment', 'settlement') NOT NULL, -- Tipe refund dihapus
+    payment_type ENUM('deposit', 'settlement') NOT NULL, -- Tipe refund dihapus
     reference_number VARCHAR(100), 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE RESTRICT,
