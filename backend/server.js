@@ -20,8 +20,10 @@ app.use('/api/auth', authRoutes);
 
 // basic error handler
 app.use((err, req, res, next) => {
-    console.log(err);
-    res.status(err.status || 500).json({ error: err.message || 'Internal Server Error'});
+  console.log(err);
+  res
+    .status(err.status || 500)
+    .json({ error: err.message || "Internal Server Error" });
 });
 
 const PORT = process.env.PORT || 3000;
@@ -29,5 +31,5 @@ app.get('/', (req, res) => {
     res.json({ message: 'API Sistem Reservasi Hotel Berjalan Normal' });
 });
 app.listen(PORT, () => {
-    console.log(`Server berjalan pada port ${PORT}`);
+  console.log(`Server berjalan pada port ${PORT}`);
 });
