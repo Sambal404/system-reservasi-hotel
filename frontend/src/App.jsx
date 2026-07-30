@@ -1,47 +1,46 @@
-import './App.css'
-
+// src/App.jsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Header from './components/Header';
-import Sidebar from './components/Sidebar';
-import Footer from './components/Footer';
+import SideBar from './components/SideBar';
+import TopBar from './components/TopBar';
 
-// Komponen halaman sementara (Nanti akan dipisah ke folder /pages)
-const DashboardPage = () => <div><h2>Tampilan Halaman Dashboard</h2></div>;
-const RoomsPage = () => <div><h2>Tampilan Halaman Rooms</h2></div>;
-const GuestsPage = () => <div><h2>Tampilan Halaman Guests</h2></div>;
-const ReservationsPage = () => <div><h2>Tampilan Halaman Reservations</h2></div>;
-const ProfilePage = () => <div><h2>Tampilan Halaman Profile</h2></div>;
+// Pages
+import Dashboard from './pages/Dashboard';
+import Rooms from './pages/Rooms';
+import Guests from './pages/Guests';
+import Reservations from './pages/Reservations';
+import CheckIn from './pages/CheckIn';
+import CheckOut from './pages/CheckOut';
+import Reports from './pages/Reports';
+import Settings from './pages/Settings';
+import LogOut from './pages/LogOut';
 
-function App() {
+export default function App() {
   return (
     <Router>
-      <div className="d-flex vh-100 bg-light">
+      <div className="min-h-screen bg-[#F8F9FA] flex">
+        {/* Sidebar Tetap di Kiri */}
+        <SideBar />
 
-        {/* Sidebar di Kiri */}
-        <Sidebar />
+        {/* Konten Utama di Sebelah Kanan Sidebar */}
+        <div className="flex-1 ml-[16.666667%] flex flex-col">
+          <TopBar />
 
-        {/* Area Kanan (Header + Konten + Footer) */}
-        <div className="d-flex flex-column flex-grow-1 overflow-hidden">
-          <Header />
-
-          {/* Konten Utama (Bisa di-scroll jika isinya panjang) */}
-          <main className="flex-grow-1 p-4 overflow-auto">
+          {/* Area Halaman Dinamis */}
+          <main className="p-6 mt-16">
             <Routes>
-              <Route path="/" element={<DashboardPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/rooms" element={<RoomsPage />} />
-              <Route path="/guests" element={<GuestsPage />} />
-              <Route path="/reservations" element={<ReservationsPage />} />
-              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/rooms" element={<Rooms />} />
+              <Route path="/guests" element={<Guests />} />
+              <Route path="/reservations" element={<Reservations />} />
+              <Route path="/check-in" element={<CheckIn />} />
+              <Route path="/check-out" element={<CheckOut />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/logout" element={<LogOut />} />
             </Routes>
           </main>
-
-          <Footer />
         </div>
-
       </div>
     </Router>
   );
 }
-
-export default App;
