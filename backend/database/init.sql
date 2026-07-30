@@ -137,7 +137,9 @@ CREATE TABLE IF NOT EXISTS reservations (
     reservation_code VARCHAR(30) NOT NULL UNIQUE, 
     guest_id INT NOT NULL,     
     user_id INT NOT NULL,      -- Pegawai (Resepsionis) yang membuat pesanan
-    status ENUM('pending', 'confirmed', 'active', 'completed', 'canceled') DEFAULT 'pending',    
+    status ENUM('pending', 'confirmed', 'active', 'completed', 'canceled') DEFAULT 'pending',
+    total_price DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+    payment_status ENUM('unpaid', 'partial', 'paid') DEFAULT 'unpaid',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (guest_id) REFERENCES guests(id) ON DELETE RESTRICT,
