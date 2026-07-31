@@ -18,14 +18,14 @@ export default function App() {
   return (
     <Router>
       <div className="min-h-screen bg-[#F8F9FA] flex">
-        {/* Sidebar Tetap di Kiri */}
+        {/* Sidebar */}
         <SideBar />
 
-        {/* Konten Utama di Sebelah Kanan Sidebar */}
+        {/* TopBar */}
         <div className="flex-1 ml-[16.666667%] flex flex-col">
           <TopBar />
 
-          {/* Area Halaman Dinamis */}
+          {/* Content Utama Area Halaman Dinamis */}
           <main className="p-6 mt-16">
             <Routes>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -42,5 +42,6 @@ export default function App() {
         </div>
       </div>
     </Router>
+      
   );
 }

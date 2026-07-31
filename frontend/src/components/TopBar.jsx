@@ -6,7 +6,7 @@ export default function TopBar() {
   return (
     <header className="ml-[16.666667%] w-[83.333333%] h-[72px] bg-slate-50 px-6 fixed top-0 right-0 z-10 box-border flex justify-between items-center">
       
-      {/* SearchBar: Melayang vertikal di tengah */}
+      {/* SearchBar */}
       <div className="relative w-108">
         <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 pointer-events-none">
           <Search size={16} />
@@ -18,7 +18,7 @@ export default function TopBar() {
         />
       </div>
 
-      {/* UserBlock: Menempel di garis bawah dengan tinggi penuh 72px */}
+      {/* UserBlock */}
       <div className="h-full flex items-end pb-3">
         <div className="flex items-center space-x-4">
           {/* Tombol Notifikasi */}
