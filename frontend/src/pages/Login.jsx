@@ -29,7 +29,7 @@ function Login(){
             localStorage.setItem("user", JSON.stringify(response.data.user));
         } catch (err){
             const msg =
-            err.response?.data?.message || (isLogin ? "Login gagal" : "Login gagal")
+            err.response?.data?.message || (isLogin ? "Login Gagal" : "Login Gagal")
             setError(msg);
         } finally{
             setLoading(false);
