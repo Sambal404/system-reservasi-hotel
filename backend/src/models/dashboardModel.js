@@ -62,9 +62,9 @@ const dashboardModel = {
             const [rows] = await db.query(
                 `SELECT 
                     ? AS tanggal,
-                    (SELECT COUNT(*) FROM reservation_rooms WHERE check_in_date = ?) AS check_in_count,
+                    (SELECT COUNT(*) FROM reservation_rooms WHERE DATE(checked_in_at) = ?) AS check_in_count,
                     (SELECT COUNT(*) FROM reservations WHERE DATE(created_at) = ?) AS reservation_count,
-                    (SELECT COUNT(*) FROM reservation_rooms WHERE check_out_date = ?) AS check_out_count;`,
+                    (SELECT COUNT(*) FROM reservation_rooms WHERE DATE(checked_out_at) = ?) AS check_out_count;`,
                 [targetDate, targetDate, targetDate, targetDate]
             );
             return rows[0];

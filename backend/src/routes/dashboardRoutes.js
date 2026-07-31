@@ -1,16 +1,16 @@
 // /src/routes/dashboardRoutes.js
 const express = require('express');
 const router = express.Router();
-const dashboardController = require('../controllers/dashboardController');
+const { getDashboardData, streamDashboard} = require('../controllers/dashboardController');
 
 // implementasi middleware verify auth pada RealTime dashboard agak sulit dilakukan
 
 // One Time
 // ENDPOINT GET /api/dashboard
-router.get('/', dashboardController.getDashboardData); 
+router.get('/', getDashboardData); 
 
 // Real Time
 // ENDPOINT GET /api/dashboard/stream
-router.get('/stream', dashboardController.streamDashboard);
+router.get('/stream', streamDashboard);
 
 module.exports = router;
