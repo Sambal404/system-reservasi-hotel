@@ -40,7 +40,7 @@ const Login = async (req, res) => {
 
     const [rows] = await db.execute(query, [username, applicationName]);
     if (!rows[0]) {
-      return res.status(401).json({ success: false, message: "Username atau Password salah" });
+      return res.status(401).json({ success: false, message: "Login gagal" });
     }
     const user = rows[0];
 
@@ -49,7 +49,7 @@ const Login = async (req, res) => {
       user.hashed_password,
     );
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Username atau Password salah" });
+      return res.status(401).json({ message: "Username atau password salah" });
     }
 
     if (!user.is_user_active) {
