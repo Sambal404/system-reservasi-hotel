@@ -83,6 +83,17 @@ const validateGuestUpdate = async(req, res, next) => {
                 return res.status(400).json({message: "Nomor Identitas sudah pernah terdaftar"});
             }
         }
+
+        //cek duplikatan nomor telepon, kecuali punya sendiri
+        if (phone){
+            const [existingPhone] = await pool.execute(
+                "SELECT id FROM guests WHERE phone = ? AND id != ?",
+                [phone, id]
+            );
+            if(existingPhone.length > 0){
+                return res.status(400).json({message: "Nomor Telepon sudah pernah terdaftar"});
+            }
+        }
         next();
 
     }catch (err){
