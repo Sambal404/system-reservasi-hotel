@@ -5,4 +5,4 @@ const roomController = require("../controllers/roomController").default;
 router.get("/", roomController.getRooms);
 router.get("/:id", roomController.getRoom);
 
-module.exports.default = router;
+module.exports = router;
