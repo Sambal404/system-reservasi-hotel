@@ -13,7 +13,7 @@ function RecentReservationTable({ reservations = [] }) {
   };
 
   return (
-    <div className={`bg-white p-5 rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 ${
+    <div className={`bg-white p-5 my-2 rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 ${
       isExpandedFull 
         ? 'absolute inset-x-6 top-16 bottom-6 z-40 overflow-y-auto shadow-xl' // Meluas menutupi area modul di bawah judul
         : 'relative'

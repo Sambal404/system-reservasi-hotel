@@ -27,7 +27,7 @@ function RoomStatusChart({ data = {} }) {
   ];
 
   return (
-    <div className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+    <div className="bg-white p-5 my-2 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
       <h3 className="text-xs font-bold text-slate-800 mb-2">Status Kamar</h3>
       
       {/* Container Grafik */}

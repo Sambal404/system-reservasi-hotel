@@ -20,7 +20,7 @@ function ReservationChart({ data = [] }) {
   }));
 
   return (
-    <div className="col-span-2 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
+    <div className="col-span-2 bg-white p-5 my-2 rounded-2xl border border-slate-100 shadow-sm flex flex-col justify-between">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-xs font-bold text-slate-800">Grafik Operasional (7 Hari Terakhir)</h3>
