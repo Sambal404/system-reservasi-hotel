@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
 
-const applicationName = process.env.APP_NAME || 'Front Office POS';
+const applicationName = process.env.APP_NAME || "Front Office POS";
+
 /**
  * Fitur login auth karyawan
  * POST /api/auth/login
@@ -10,7 +11,6 @@ const applicationName = process.env.APP_NAME || 'Front Office POS';
 
 const Login = async (req, res) => {
   try {
-    
     const { username, password } = req.body;
 
     const query = `
@@ -39,35 +39,18 @@ const Login = async (req, res) => {
     `;
 
     const [rows] = await db.execute(query, [username, applicationName]);
+    
+    // Verifikasi username, app, password
     if (!rows[0]) {
       return res.status(401).json({ success: false, message: "Login gagal" });
     }
+
     const user = rows[0];
 
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.hashed_password,
-    );
-    if (!isPasswordValid) {
-      return res.status(401).json({ message: "Username atau password salah" });
+    const isPasswordValid = await bcrypt.compare(password, user.hashed_password);
+    if (!isPasswordValid || !user.is_user_active) {
+      return res.status(401).json({ success: false, message: "Login gagal" });
     }
-
-    if (!user.is_user_active) {
-      return res.status(403).json({
-        success: false,
-        message: "Akun anda nonaktif. Silahkan hubungi admin",
-      });
-    }
-
-    // tidak diperlukan, employee_status untuk HR kelola
-    // if (user.employee_status !== "active") {
-    //   const msg =
-    //     user.employee_status === "resigned"
-    //       ? "Akses ditolak. Status pegawai sudah Resigned"
-    //       : "Akses ditolak. Status kepegawaian tidak aktif.";
-
-    //   return res.status(403).json({ success: false, message: msg });
-    // }
 
     const payload = {
       userId: user.user_id,
@@ -83,8 +66,8 @@ const Login = async (req, res) => {
       payload,
       process.env.JWT_SECRET || "secret_key_sementara",
       {
-        expiresIn: "9h", // 9h = 8h shift + 1 hour toleransi untuk transisi
-      },
+        expiresIn: "9h", // 8h shift + 1 hour toleransi untuk transisi
+      }
     );
 
     return res.status(200).json({
