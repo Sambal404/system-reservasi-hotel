@@ -12,12 +12,12 @@ const validateGuestCreate = async (req, res, next) => {
             return res.status(400).json({message: "Nama, Gender, Tipe Identitas, Nomor Identitas, dan Nomor Telepon wajib diisi!"});
         }
 
-        //validasi yang sesuai dipilihan aja 
+        //validasi yang sesuai yang ada dipilihan 
         if (!["identity_card", "passport"].includes(identity_type)){
-            return res.status(400).json({message: "Tipe Identitas harus KTP atau Passport"});
+            return res.status(400).json({message: "Tipe Identitas harus Identity Card atau Passport"});
         }
         if (gender && !['male', 'female'].includes(gender)) {
-      return res.status(400).json({ message: 'Jenis kelamin harus Pria atau Wanita' });
+      return res.status(400).json({ message: 'Jenis kelamin harus male atau female' });
     }
 
         //validasi format email
@@ -34,10 +34,16 @@ const validateGuestCreate = async (req, res, next) => {
         res.status(201).json({ id: result.insertId, name, gender, identity_type, identity_number, phone, email});
 
     }catch (err){
-        //bakalan error kalau ternyata ada keduplikatan nomor identitas
+        //bakalan error kalau ternyata ada keduplikatan nomor identitas dan nomor telepon
         if (err.code === "ER_DUP_ENTRY"){
-            return res.status(409).json ({message: "Nomor identitas sudah terdaftar"});
+            if (err.message.includes("identity_number")){
+                return res.status(409).json ({message: "Nomor Identitas sudah terdaftar"})
+            }
+            if (err.message.includes("phone")){
+            return res.status(409).json ({message: "Nomor Telepon sudah terdaftar"});
         }
+        return res.status(409).json({message: "Data sudah terdaftar"})
+    }
         next(err);
     }
 };
@@ -59,7 +65,7 @@ const validateGuestUpdate = async(req, res, next) => {
         }
 
         if(gender && !["male", "female"].includes(gender)){
-            return res.status(400).json({message: "Jenis Kelamin harus Pria atau Wanita"});
+            return res.status(400).json({message: "Jenis Kelamin harus male atau female"});
         }
         
         if(email && !/^\S+@\S+\.\S+$/.test(email)){
