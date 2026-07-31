@@ -1,14 +1,28 @@
 // /src/controllers/reservationController.js
 
-const ReservationModel = require('../models/reservationModel');
+// !NOTE!
+// payload = {
+//     userId: user.user_id,
+//     employeeId: user.employee_id,
+//     fullName: user.full_name,
+//     positionId: user.position_id,
+//     applicationId: user.application_id,
+//     applicationName: user.application_name,
+//     role: user.role,
+// };
+
+const { createReservation, getReservations } = require('../models/reservationModel');
 
 
-createReservation = async (req, res) => {
+const createNewReservation = async (req, res) => {
     try {
         const { guest_id, rooms } = req.body;
-        const user_id = req.user.id; // Diambil dari middleware verifyToken
+        const user_id = req.user.userId; // Diambil dari middleware verifyToken
 
-        const result = await ReservationModel.createReservationTransaction(guest_id, user_id, rooms);
+        // DEBUG: Cek apa yang sebenarnya dikirim
+        console.log("DEBUG controller:", { guest_id, user_id, rooms });
+        
+        const result = await createReservation(guest_id, user_id, rooms);
 
         return res.status(201).json({
             success: true,
@@ -35,11 +49,11 @@ createReservation = async (req, res) => {
             message: "Terjadi kesalahan pada server saat memproses reservasi."
         });
     }
-},
+}
 
-getAllReservations = async (req, res) => {
+const getAllReservations = async (req, res) => {
     try {
-        const reservations = await ReservationModel.getAllReservations();
+        const reservations = await getReservations();
         return res.status(200).json({
             success: true,
             data: reservations
@@ -54,4 +68,7 @@ getAllReservations = async (req, res) => {
 }
 
 
-module.exports = reservationController;
+module.exports = {
+    createNewReservation,
+    getAllReservations
+}
