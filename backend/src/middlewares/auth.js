@@ -53,7 +53,4 @@ const verifyRole = (allowedRoles) => {
     };
 };
 
-module.exports = {
-    verifyToken,
-    verifyRole
-}
+module.exports = { verifyToken, verifyRole};

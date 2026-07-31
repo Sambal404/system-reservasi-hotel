@@ -8,16 +8,10 @@ const applicationName = process.env.APP_NAME || 'Front Office POS';
  * POST /api/auth/login
  */
 
-<<<<<<< HEAD
 const Login = async (req, res) => {
- 
-=======
-exports.login = async (req, res) => {
->>>>>>> a580d395bc9cf4ca1038bad3cc3729cf190fe5d1
   try {
     
     const { username, password } = req.body;
-    
 
     const query = `
       SELECT
@@ -116,7 +110,5 @@ exports.login = async (req, res) => {
     });
   }
 };
-<<<<<<< HEAD
- module.exports = Login;
-=======
->>>>>>> a580d395bc9cf4ca1038bad3cc3729cf190fe5d1
+
+module.exports = Login;

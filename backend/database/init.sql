@@ -120,7 +120,7 @@ CREATE TABLE IF NOT EXISTS guests (
     identity_type ENUM('identity_card', 'passport') NOT NULL, 
     identity_number VARCHAR(50) NOT NULL UNIQUE, 
     -- Contact
-    phone VARCHAR(20) NOT NULL,
+    phone VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
