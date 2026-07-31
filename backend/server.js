@@ -1,10 +1,15 @@
 // server.js //
 
-const express = require("express");
-const cors = require("cors");
-const dotenv = require("dotenv");
-const authRoutes = require("./src/routes/authRoutes");
-const roomRoutes = require("./src/routes/roomRoutes").default;
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+
+// ROUTES
+const authRoutes = require('./src/routes/authRoutes');
+const dashboardRoutes = require('./src/routes/dashboardRoutes')
+const guestRoutes = require("./src/routes/guestRoutes");
+const roomRoutes = require("./src/routes/roomRoutes"):
+
 dotenv.config();
 const app = express();
 
@@ -13,8 +18,16 @@ app.use(cors()); // buka untuk semua
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 // Auth routes
-app.use("/api/auth", authRoutes);
+app.use('/api/auth', authRoutes);
+// Dashboard routes
+app.use('/api/dashboard', dashboardRoutes);
+// Guests routes
+app.use("/api/guests", guestRoutes);
+// Room routes
+app.use('api/rooms', roomRoutes);
+
 
 // basic error handler
 app.use((err, req, res, next) => {

@@ -2,8 +2,6 @@
 --  DATABASE HOTEL ===
 -- =============== ===
 
-DROP DATABASE IF EXISTS hotel_db;
-
 CREATE DATABASE IF NOT EXISTS hotel_db;
 USE hotel_db;
 
@@ -122,7 +120,7 @@ CREATE TABLE IF NOT EXISTS guests (
     identity_type ENUM('identity_card', 'passport') NOT NULL, 
     identity_number VARCHAR(50) NOT NULL UNIQUE, 
     -- Contact
-    phone VARCHAR(20) NOT NULL,
+    phone VARCHAR(20) NOT NULL UNIQUE,
     email VARCHAR(100),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -137,7 +135,9 @@ CREATE TABLE IF NOT EXISTS reservations (
     reservation_code VARCHAR(30) NOT NULL UNIQUE, 
     guest_id INT NOT NULL,     
     user_id INT NOT NULL,      -- Pegawai (Resepsionis) yang membuat pesanan
-    status ENUM('pending', 'confirmed', 'active', 'completed', 'canceled') DEFAULT 'pending',    
+    status ENUM('pending', 'confirmed', 'active', 'completed', 'canceled') DEFAULT 'pending',
+    total_price DECIMAL(12, 2) NOT NULL DEFAULT 0.00,
+    payment_status ENUM('unpaid', 'partial', 'paid') DEFAULT 'unpaid',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (guest_id) REFERENCES guests(id) ON DELETE RESTRICT,
@@ -183,7 +183,7 @@ CREATE TABLE IF NOT EXISTS payments (
     user_id INT NOT NULL, -- Kasir yang menerima uang
     amount DECIMAL(12, 2) NOT NULL, -- Pasti bernilai positif
     payment_method ENUM('cash', 'debit_card', 'credit_card', 'transfer', 'qris') NOT NULL, 
-    payment_type ENUM('down_payment', 'settlement') NOT NULL, -- Tipe refund dihapus
+    payment_type ENUM('deposit', 'settlement') NOT NULL, -- Tipe refund dihapus
     reference_number VARCHAR(100), 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (reservation_id) REFERENCES reservations(id) ON DELETE RESTRICT,
