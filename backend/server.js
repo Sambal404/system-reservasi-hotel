@@ -3,7 +3,10 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+
+// ROUTES
 const authRoutes = require('./src/routes/authRoutes');
+const dashboardRoutes = require('./src/routes/dashboardRoutes')
 const guestRoutes = require("./src/routes/guestRoutes");
 
 dotenv.config();
@@ -14,12 +17,13 @@ app.use(cors()); // buka untuk semua
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+
 // Auth routes
 app.use('/api/auth', authRoutes);
-
+// Dashboard routes
+app.use('/api/dashboard', dashboardRoutes);
 //Guests routes
 app.use("/api/guests", guestRoutes);
-
 
 
 // basic error handler
