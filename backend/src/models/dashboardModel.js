@@ -78,29 +78,69 @@ const dashboardModel = {
     // 4. Data Reservasi Terakhir (Tanpa View, langsung JOIN tabel asli)
     getRecentReservations: async () => {
         try {
+
+            // Wajib Jalankan /database/views/vw_reservation_long_summary.sql
+            // const [rows] = await db.query(
+            //     `SELECT 
+            //         reservation_id,
+            //         reservation_code,
+            //         guest_name,
+            //         reservation_status,
+            //         payment_status,
+            //         JSON_ARRAYAGG(
+            //             JSON_OBJECT(
+            //                 'room_type_name', room_type_name,
+            //                 'total_rooms', total_rooms
+            //             )
+            //         ) AS rooms_detail,
+            //         created_by
+            //     FROM vw_reservation_long_summary
+            //     GROUP BY 
+            //         reservation_id,
+            //         reservation_code,
+            //         guest_name,
+            //         reservation_status,
+            //         payment_status,
+            //         created_by;`
+            // );
+
+            // Tanpa view bisa langsung pakai (Jangan tanya gw juga gak ngerti)
             const [rows] = await db.query(
-                `SELECT 
-                    reservation_id,
-                    reservation_code,
-                    guest_name,
-                    reservation_status,
-                    payment_status,
-                    JSON_ARRAYAGG(
-                        JSON_OBJECT(
-                            'room_type_name', room_type_name,
-                            'total_rooms', total_rooms
-                        )
-                    ) AS rooms_detail,
-                    created_by
-                FROM vw_reservation_long_summary
-                GROUP BY 
-                    reservation_id,
-                    reservation_code,
-                    guest_name,
-                    reservation_status,
-                    payment_status,
-                    created_by;`
-            );
+                `WITH RoomCounts AS (
+                    SELECT 
+                        rr.reservation_id,
+                        rt.name AS room_type_name,
+                        COUNT(rr.id) AS total_rooms
+                    FROM reservation_rooms rr
+                    JOIN room_types rt ON rr.room_type_id = rt.id
+                    GROUP BY rr.reservation_id, rt.id, rt.name
+                ),
+                RoomJSONAgg AS (
+                    SELECT 
+                        reservation_id,
+                        JSON_ARRAYAGG(
+                            JSON_OBJECT(
+                                'room_type_name', room_type_name,
+                                'total_rooms', total_rooms
+                            )
+                        ) AS rooms_detail
+                    FROM RoomCounts
+                    GROUP BY reservation_id
+                )
+                SELECT 
+                    r.id AS reservation_id,
+                    r.reservation_code,
+                    g.name AS guest_name,
+                    r.status AS reservation_status,
+                    r.payment_status,
+                    ra.rooms_detail,
+                    e.full_name AS created_by
+                FROM reservations r
+                JOIN guests g ON r.guest_id = g.id
+                LEFT JOIN users u ON r.user_id = u.id
+                LEFT JOIN employees e ON u.employee_id = e.id
+                LEFT JOIN RoomJSONAgg ra ON r.id = ra.reservation_id;`
+            )
 
             // Cek apakah data ada dan lakukan parsing jika diperlukan
             if (!rows) return [];

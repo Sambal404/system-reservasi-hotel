@@ -1,6 +1,6 @@
 // src/components/TopBar.jsx
 import { Search, Bell } from 'lucide-react';
-import hertaProfile from '../assets/herta-0.png'; // Sesuaikan jalur impor gambar Anda
+import hertaProfile from '../assets/herta-0.png'; // Sesuaikan Jalur Impor Anda (Note: Cara masukan gambar ke react)
 
 export default function TopBar() {
   return (
