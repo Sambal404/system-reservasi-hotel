@@ -1,6 +1,7 @@
 // src/components/Dashboard.jsx
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import api from "../api/api"
 
 // Components
 import StatCard from '../components/StatCard';
@@ -64,7 +65,7 @@ function Dashboard() {
         const fetchDashboardData = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get('http://localhost:3001/api/dashboard');
+                const response = await api.get('/dashboard');
                 if (response.data.success) {
                     setDashboardData(response.data.data);
                 }
