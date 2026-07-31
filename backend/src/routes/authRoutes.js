@@ -4,6 +4,6 @@ const authController = require('../controllers/authController');
 const { validateLogin } = require('../middlewares/validations/authValidation');
 
 // Endpoint: POST /api/auth/login
-router.post('/login', validateLogin, authController.login);
+router.post('/login', validateLogin, authController);
 
 module.exports = router;
