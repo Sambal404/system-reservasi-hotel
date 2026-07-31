@@ -3,7 +3,7 @@
 const db = require('../config/db');
 const crypto = require('crypto');
 
-const ReservationModel = {
+const reservationModel = {
   
     createReservationTransaction: async (guest_id, user_id, rooms) => {
         // Start Connection
@@ -105,4 +105,4 @@ getAllReservations: async () => {
     }
 };
 
-module.exports = ReservationModel;
+module.exports = reservationModel;
