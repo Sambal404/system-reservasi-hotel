@@ -95,17 +95,34 @@ const createReservation = async (guest_id, user_id, rooms) => {
 
 const getReservations = async () => {
     const [rows] = await db.query(
-        `SELECT
-            r.id AS reservation_id,
-            r.reservation_code,
-            g.name AS guest_name, 
-            r.status AS reservation_status,
-            r.payment_status,
-            r.created_at,
-            r.user_id as created_by
+        `SELECT 
+        r.id AS reservation_id,
+        r.reservation_code,
+        r.guest_id,
+        g.name AS guest_name,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'room_type_id', rr.room_type_id,
+                'room_type_name', rt.name,
+                'room_id', rr.room_id,
+                'room_number', rm.room_number,
+                'price_per_night', rr.price_per_night,
+                'total_adults', rr.total_adults,
+                'total_children', rr.total_children
+            )
+        ) AS detail_reservations,
+        r.user_id
         FROM reservations r
         JOIN guests g ON r.guest_id = g.id
-        ORDER BY r.created_at DESC`
+        JOIN reservation_rooms rr ON r.id = rr.reservation_id
+        JOIN room_types rt ON rr.room_type_id = rt.id
+        LEFT JOIN rooms rm ON rr.room_id = rm.id
+        GROUP BY 
+        r.id, 
+        r.reservation_code, 
+        r.guest_id, 
+        g.name, 
+        r.user_id;`
     );
     return rows;
 }
