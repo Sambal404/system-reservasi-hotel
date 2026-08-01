@@ -100,6 +100,9 @@ const getReservations = async () => {
         r.reservation_code,
         r.guest_id,
         g.name AS guest_name,
+        r.status,
+        r.payment_status,
+        r.total_price
         JSON_ARRAYAGG(
             JSON_OBJECT(
                 'room_type_id', rr.room_type_id,
@@ -127,8 +130,53 @@ const getReservations = async () => {
     return rows;
 }
 
+const getReservation = async (reservationId) => {
+    const [rows] = await db.query(
+        `SELECT 
+        r.id AS reservation_id,
+        r.reservation_code,
+        r.guest_id,
+        g.name AS guest_name,
+        r.total_price,
+        JSON_ARRAYAGG(
+            JSON_OBJECT(
+                'room_type_id', rr.room_type_id,
+                'room_type_name', rt.name,
+                'room_id', rr.room_id,
+                'room_number', rm.room_number,
+                'price_per_night', rr.price_per_night,
+                'total_adults', rr.total_adults,
+                'total_children', rr.total_children,
+                'room_status', rr.room_status,
+                'check_in_date', rr.check_in_date,
+                'check_out_date', rr.check_out_date,
+                'checked_in_at', rr.checked_in_at,
+                'checked_in_by', rr.check_in_by,
+                'checked_out_at', rr.checked_out_at,
+                'checked_out_by', rr.check_out_by
+            )
+        ) AS detail_reservations,
+        r.user_id
+        FROM reservations r
+        JOIN guests g ON r.guest_id = g.id
+        JOIN reservation_rooms rr ON r.id = rr.reservation_id
+        JOIN room_types rt ON rr.room_type_id = rt.id
+        LEFT JOIN rooms rm ON rr.room_id = rm.id
+        WHERE r.id = ?
+        GROUP BY 
+        r.id, 
+        r.reservation_code, 
+        r.guest_id, 
+        g.name, 
+        r.total_price,
+        r.user_id;`,
+        [reservationId]
+    );
+    return rows[0] || null;
+}
 
 module.exports = {
     createReservation,
-    getReservations
+    getReservations,
+    getReservation
 }
