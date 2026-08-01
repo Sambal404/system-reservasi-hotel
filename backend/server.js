@@ -10,6 +10,7 @@ const dashboardRoutes = require('./src/routes/dashboardRoutes')
 const guestRoutes = require("./src/routes/guestRoutes");
 const roomRoutes = require("./src/routes/roomRoutes");
 const reservationRoutes = require('./src/routes/reservationRoutes');
+const reservationRoomRoutes = require('./src/routes/reservationRoomRoutes');
 
 dotenv.config();
 const app = express();
@@ -26,9 +27,11 @@ app.use('/api/dashboard', dashboardRoutes);
 // Guests routes
 app.use("/api/guests", guestRoutes);
 // Room routes
-app.use('api/rooms', roomRoutes);
+app.use('/api/rooms', roomRoutes);
 // Reservation routes
 app.use('/api/reservations', reservationRoutes);
+// Reservation Rooms routes
+app.use('/api/reservation-rooms', reservationRoomRoutes);
 
 
 // basic error handler
