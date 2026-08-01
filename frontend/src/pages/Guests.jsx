@@ -56,17 +56,46 @@ const Guests = () => {
         }
       });
 
-      const response = await api.get('/guests', { params });
+    //   const response = await api.get('/guests', { params });
 
-      if (response.data.success) {
-        setGuests(response.data.data);
-        if (response.data.pagination) {
-          setTotalPages(response.data.pagination.totalPages);
-          setTotalGuests(response.data.pagination.total);
+    //   if (response.data.success) {
+    //     setGuests(response.data.data);
+    //     if (response.data.pagination) {
+    //       setTotalPages(response.data.pagination.totalPages);
+    //       setTotalGuests(response.data.pagination.total);
+    //     }
+    //   } else {
+    //     setError(response.data.message || 'Gagal mengambil data tamu');
+    //   }
+
+        // Debug
+        // Sesuaikan endpoint
+        const response = await api.get('/guests');
+
+        let allGuests = response.data.success ? response.data.data : [];
+            // Debug
+            console.log("DEBUG: ", allGuests);
+
+        // Fitur search di lokal (frontend react);
+        if (filters.search) {
+            const keyword = filters.search.toLowerCase();
+            allGuests = allGuests.find ? allGuests.filter(g => 
+            (g.name && g.name.toLowerCase().includes(keyword)) ||
+            (g.email && g.email.toLowerCase().includes(keyword)) ||
+            (g.phone && g.phone.toLowerCase().includes(keyword)) ||
+            (g.id_card && g.id_card.toLowerCase().includes(keyword))
+            ) : allGuests;
         }
-      } else {
-        setError(response.data.message || 'Gagal mengambil data tamu');
-      }
+
+        // Fitur filter juga
+        if (filters.gender) {
+            allGuests = allGuests.filter(g => g.gender === filters.gender);
+        }
+
+        setGuests(allGuests);
+        setTotalGuests(allGuests.length);
+
+
     } catch (err) {
       console.error('Error fetching guests:', err);
       setError(err.response?.data?.message || 'Tidak dapat terhubung ke server');
