@@ -11,7 +11,7 @@
 //     role: user.role,
 // };
 
-const { createReservation, getReservations } = require('../models/reservationModel');
+const { createReservation, getReservations, getReservation } = require('../models/reservationModel');
 
 
 const createNewReservation = async (req, res) => {
@@ -67,8 +67,25 @@ const getAllReservations = async (req, res) => {
     }
 }
 
+const getReservationById = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id, 10);
+        const reservation = await getReservation(id);
+        return res.status(200).json({
+            success: true,
+            data: reservation
+        });
+    } catch (error) {
+        console.error("Error pada getAllReservations:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Gagal mengambil data reservasi."
+        });
+    }
+}
 
 module.exports = {
     createNewReservation,
-    getAllReservations
+    getAllReservations,
+    getReservationById
 }
