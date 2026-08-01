@@ -12,16 +12,16 @@
 // };
 
 const { 
-    getAllReservationRoomsDb, 
-    checkInRoomDb, 
-    checkOutRoomDb, 
+    getAllReservationRooms, 
+    checkInRoom, 
+    checkOutRoom, 
     updateReservationRoomById
 } = require('../models/reservationRoomModel');
 
 // GET /api/reservation-rooms/
 const getReservationRooms = async (req, res) => {
     try {
-        const rooms = await getAllReservationRoomsDb();
+        const rooms = await getAllReservationRooms();
         return res.status(200).json({
             success: true,
             message: "Berhasil mengambil daftar reservation rooms",
@@ -39,7 +39,7 @@ const checkIn = async (req, res) => {
         const { id } = req.params; // reservation_room_id
         const userId = req.user.userId; // Token JWT
 
-        const affectedRows = await checkInRoomDb(id, userId);
+        const affectedRows = await checkInRoom(id, userId);
         if (affectedRows === 0) {
             return res.status(400).json({
                 success: false,
@@ -63,7 +63,7 @@ const checkOut = async (req, res) => {
         const { id } = req.params;
         const userId = req.user.userId; 
 
-        const affectedRows = await checkOutRoomDb(id, userId);
+        const affectedRows = await checkOutRoom(id, userId);
         if (affectedRows === 0) {
             return res.status(400).json({
                 success: false,
