@@ -28,6 +28,7 @@ export default function App() {
           {/* Content Utama Area Halaman Dinamis */}
           <main className="p-6 mt-16">
             <Routes>
+              <Route path="/" element={<Dashboard />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/rooms" element={<Rooms />} />
               <Route path="/guests" element={<Guests />} />
