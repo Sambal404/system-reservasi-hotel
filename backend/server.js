@@ -26,7 +26,7 @@ app.use('/api/dashboard', dashboardRoutes);
 // Guests routes
 app.use("/api/guests", guestRoutes);
 // Room routes
-app.use('api/rooms', roomRoutes);
+app.use('/api/rooms', roomRoutes);
 // Reservation routes
 app.use('/api/reservations', reservationRoutes);
 
