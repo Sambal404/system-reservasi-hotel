@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 // Get All Reservation Rooms
-const getAllReservationRoomsDb = async () => {
+const getAllReservationRooms = async () => {
     const [rows] = await db.query(`
         SELECT 
             r.id AS reservation_id,
@@ -22,7 +22,7 @@ const getAllReservationRoomsDb = async () => {
 };
 
 // Check-in
-const checkInRoomDb = async (reservationRoomId, userId) => {
+const checkInRoom = async (reservationRoomId, userId) => {
     const connection = await db.getConnection();
     try {
         await connection.beginTransaction();
@@ -84,7 +84,7 @@ const checkInRoomDb = async (reservationRoomId, userId) => {
 };
 
 // Check-out (Updated with Transaction & Automatic Completed Check)
-const checkOutRoomDb = async (reservationRoomId, userId) => {
+const checkOutRoom = async (reservationRoomId, userId) => {
     const connection = await db.getConnection();
     try {
         await connection.beginTransaction();
@@ -167,8 +167,8 @@ const updateReservationRoomById = async (reservationRoomId, data) => {
 };
 
 module.exports = {
-    getAllReservationRoomsDb,
-    checkInRoomDb,
-    checkOutRoomDb,
+    getAllReservationRooms,
+    checkInRoom,
+    checkOutRoom,
     updateReservationRoomById
 };
