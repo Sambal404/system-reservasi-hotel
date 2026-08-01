@@ -56,45 +56,28 @@ const Guests = () => {
         }
       });
 
-    //   const response = await api.get('/guests', { params });
+      const response = await api.get('/guests');
 
-    //   if (response.data.success) {
-    //     setGuests(response.data.data);
-    //     if (response.data.pagination) {
-    //       setTotalPages(response.data.pagination.totalPages);
-    //       setTotalGuests(response.data.pagination.total);
-    //     }
-    //   } else {
-    //     setError(response.data.message || 'Gagal mengambil data tamu');
-    //   }
+      let allGuests = response.data.success ? response.data.data : [];
+      
+      // Fitur search di lokal (frontend react);
+      if (filters.search) {
+        const keyword = filters.search.toLowerCase();
+        allGuests = allGuests.filter ? allGuests.filter(g => 
+          (g.name && g.name.toLowerCase().includes(keyword)) ||
+          (g.email && g.email.toLowerCase().includes(keyword)) ||
+          (g.phone && g.phone.toLowerCase().includes(keyword)) ||
+          (g.id_card && g.id_card.toLowerCase().includes(keyword))
+        ) : allGuests;
+      }
 
-        // Debug
-        // Sesuaikan endpoint
-        const response = await api.get('/guests');
+      // Fitur filter juga
+      if (filters.gender) {
+        allGuests = allGuests.filter(g => g.gender === filters.gender);
+      }
 
-        let allGuests = response.data.success ? response.data.data : [];
-            // Debug
-            console.log("DEBUG: ", allGuests);
-
-        // Fitur search di lokal (frontend react);
-        if (filters.search) {
-            const keyword = filters.search.toLowerCase();
-            allGuests = allGuests.find ? allGuests.filter(g => 
-            (g.name && g.name.toLowerCase().includes(keyword)) ||
-            (g.email && g.email.toLowerCase().includes(keyword)) ||
-            (g.phone && g.phone.toLowerCase().includes(keyword)) ||
-            (g.id_card && g.id_card.toLowerCase().includes(keyword))
-            ) : allGuests;
-        }
-
-        // Fitur filter juga
-        if (filters.gender) {
-            allGuests = allGuests.filter(g => g.gender === filters.gender);
-        }
-
-        setGuests(allGuests);
-        setTotalGuests(allGuests.length);
-
+      setGuests(allGuests);
+      setTotalGuests(allGuests.length);
 
     } catch (err) {
       console.error('Error fetching guests:', err);
@@ -178,7 +161,6 @@ const Guests = () => {
 
     try {
       if (isEditMode && selectedGuest) {
-        // Update existing guest
         const response = await api.put(`/guests/${selectedGuest.id}`, formData);
         if (response.data.success) {
           closeModal();
@@ -187,7 +169,6 @@ const Guests = () => {
           setFormError(response.data.message || 'Gagal mengupdate data');
         }
       } else {
-        // Create new guest
         const response = await api.post('/guests', formData);
         if (response.data.success) {
           closeModal();
@@ -249,7 +230,7 @@ const Guests = () => {
   if (loading && guests.length === 0) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-yellow-600"></div>
         <span className="ml-3 text-gray-600">Memuat data tamu...</span>
       </div>
     );
@@ -265,7 +246,7 @@ const Guests = () => {
         <p className="text-red-600 mb-4">{error}</p>
         <button
           onClick={fetchGuests}
-          className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600"
+          className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700"
         >
           Coba Lagi
         </button>
@@ -278,12 +259,12 @@ const Guests = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Guest Directory</h1>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Data Tamu</h1>
           <p className="text-gray-600">Kelola data tamu hotel Grand Nusantara</p>
         </div>
         <button
           onClick={openAddModal}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 shadow-md"
+          className="px-6 py-3 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors flex items-center gap-2 shadow-md"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -310,7 +291,7 @@ const Guests = () => {
                 placeholder="Cari nama, email, nomor telepon, atau KTP..."
                 value={filters.search}
                 onChange={handleFilterChange}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -324,7 +305,7 @@ const Guests = () => {
               name="gender"
               value={filters.gender}
               onChange={handleFilterChange}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
             >
               <option value="">Semua</option>
               <option value="male">Laki-laki</option>
@@ -336,36 +317,36 @@ const Guests = () => {
         {(filters.search || filters.gender) && (
           <button
             onClick={handleClearFilters}
-            className="mt-3 text-sm text-blue-600 hover:text-blue-800 font-medium"
+            className="mt-3 text-sm text-yellow-600 hover:text-yellow-800 font-medium"
           >
-            ✕ Clear Filters
+             Clear Filters
           </button>
         )}
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white shadow-md">
+        <div className="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-lg p-6 text-white shadow-md">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm">Total Tamu</p>
+              <p className="text-yellow-100 text-sm">Total Tamu</p>
               <p className="text-3xl font-bold mt-1">{totalGuests}</p>
             </div>
-            <svg className="w-12 h-12 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-12 h-12 text-yellow-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-6 text-white shadow-md">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white shadow-md">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-green-100 text-sm">Laki-laki</p>
+              <p className="text-blue-100 text-sm">Laki-laki</p>
               <p className="text-3xl font-bold mt-1">
                 {guests.filter(g => g.gender === 'male').length}
               </p>
             </div>
-            <span className="text-5xl"></span>
+            <span className="text-5xl">👨</span>
           </div>
         </div>
 
@@ -409,13 +390,13 @@ const Guests = () => {
                 </tr>
               ) : (
                 guests.map((guest, index) => (
-                  <tr key={guest.id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={guest.id} className="hover:bg-yellow-50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-xl">
+                        <div className="flex-shrink-0 h-10 w-10 rounded-full bg-yellow-100 flex items-center justify-center text-xl">
                           {getGenderIcon(guest.gender)}
                         </div>
                         <div className="ml-4">
@@ -443,7 +424,7 @@ const Guests = () => {
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => openEditModal(guest)}
-                          className="text-blue-600 hover:text-blue-900 p-2 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="text-yellow-600 hover:text-yellow-800 p-2 hover:bg-yellow-100 rounded-lg transition-colors"
                           title="Edit"
                         >
                           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -481,14 +462,14 @@ const Guests = () => {
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 text-sm"
+                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-yellow-50 text-sm"
               >
                 ← Sebelumnya
               </button>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
-                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 text-sm"
+                className="px-4 py-2 border border-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-yellow-50 text-sm"
               >
                 Selanjutnya →
               </button>
@@ -534,7 +515,7 @@ const Guests = () => {
                     value={formData.name}
                     onChange={handleFormChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     placeholder="Masukkan nama lengkap"
                   />
                 </div>
@@ -549,7 +530,7 @@ const Guests = () => {
                     name="email"
                     value={formData.email}
                     onChange={handleFormChange}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     placeholder="email@example.com"
                   />
                 </div>
@@ -565,7 +546,7 @@ const Guests = () => {
                     value={formData.phone}
                     onChange={handleFormChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     placeholder="08123456789"
                   />
                 </div>
@@ -581,7 +562,7 @@ const Guests = () => {
                     value={formData.id_card}
                     onChange={handleFormChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     placeholder="16 digit nomor KTP"
                     maxLength={16}
                   />
@@ -597,7 +578,7 @@ const Guests = () => {
                     value={formData.gender}
                     onChange={handleFormChange}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                   >
                     <option value="male">Laki-laki</option>
                     <option value="female">Perempuan</option>
@@ -614,7 +595,7 @@ const Guests = () => {
                     value={formData.address}
                     onChange={handleFormChange}
                     rows={3}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent"
                     placeholder="Alamat lengkap"
                   />
                 </div>
@@ -631,7 +612,7 @@ const Guests = () => {
                 <button
                   type="submit"
                   disabled={formLoading}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-6 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {formLoading && (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
