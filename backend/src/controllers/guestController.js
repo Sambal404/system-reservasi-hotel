@@ -4,7 +4,12 @@ const pool = require("../config/db");
 const getGuest = async (req, res, next) =>{
     try {
         const [rows] = await pool.execute("SELECT * FROM guests ORDER BY id DESC");
-        res.json(rows);
+
+        // Debug 
+        res.json({
+            success: true,
+            data: rows
+        });
     }catch (err) { 
         next (err);
     }
