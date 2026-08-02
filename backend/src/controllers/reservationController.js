@@ -11,111 +11,81 @@
 //     role: user.role,
 // };
 
-const { createReservation, getReservations, getReservation } = require('../models/reservationModel');
+const reservationModel = require('../models/reservationModel');
 
 
-const createNewReservation = async (req, res) => {
-    try {
-        const { guest_id, rooms } = req.body;
-        const user_id = req.user.userId; // Diambil dari middleware verifyToken
+// POST /api/reservations
+const createReservation = async (req, res, next) => {
+  try {
+    const { guest_id, rooms } = req.body;
+    const user_id = req.user.userId; // Diambil dari middleware verifyToken
 
-        // DEBUG: Cek apa yang sebenarnya dikirim
-        console.log("DEBUG controller:", { guest_id, user_id, rooms });
-        
-        const result = await createReservation(guest_id, user_id, rooms);
+    const newReservationId = await reservationModel.createReservation(guest_id, user_id, rooms);
+    
+    return res.status(201).json({
+      success: true,
+      message: "Reservasi berhasil dibuat.",
+      data: { reservation_id: newReservationId }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
-        return res.status(201).json({
-            success: true,
-            message: "Reservasi berhasil dibuat!",
-            data: {
-                reservationId: result.reservationId,
-                reservationCode: result.reservationCode
-            }
-        });
 
-    } catch (error) {
-        console.error("Error pada createReservation:", error);
-        
-        // Tangkap error spesifik kamar tersedia tidak mencukupi
-        if (error.message.includes('tidak mencukupi')) {
-            return res.status(409).json({
-                success: false,
-                message: error.message
-            });
-        }
+// GET /api/reservations
+const getAllReservations = async (req, res, next) => {
+  try {
+    const reservations = await reservationModel.getReservations();
+    return res.status(200).json({ success: true, data: reservations });
+  } catch (error) {
+    next(error);
+  }
+};
 
-        return res.status(500).json({
-            success: false,
-            message: "Terjadi kesalahan pada server saat memproses reservasi."
-        });
+
+
+// GET /api/reservations/:id
+const getReservationById = async (req, res, next) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const reservation = await reservationModel.getReservation(id);
+    
+    if (!reservation) {
+        return res.status(404).json({ success: false, message: "Reservasi tidak ditemukan." });
     }
-}
 
-const getAllReservations = async (req, res) => {
-    try {
-        const reservations = await getReservations();
-        return res.status(200).json({
-            success: true,
-            data: reservations
-        });
-    } catch (error) {
-        console.error("Error pada getAllReservations:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Gagal mengambil data reservasi."
-        });
-    }
-}
-
-const getReservationById = async (req, res) => {
-    try {
-        const id = parseInt(req.params.id, 10);
-        const reservation = await getReservation(id);
-        return res.status(200).json({
-            success: true,
-            data: reservation
-        });
-    } catch (error) {
-        console.error("Error pada getAllReservations:", error);
-        return res.status(500).json({
-            success: false,
-            message: "Gagal mengambil data reservasi."
-        });
-    }
-}
+    return res.status(200).json({ success: true, data: reservation });
+  } catch (error) {
+    next(error);
+  }
+};
 
 
-const updateGuestOfReservation = async (req, res) => {
+// PATCH /api/reservations/:id/guest
+const updateGuestOfReservation = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { guest_id } = req.body;
 
     if (!guest_id) {
-      return res.status(400).json({ 
-        success: false, 
-        message: "Data guest_id baru wajib dikirimkan." 
-      });
+        return res.status(400).json({ success: false, message: "guest_id wajib diisi." });
     }
 
-    await updateReservationGuest(id, guest_id);
-    
-    return res.status(200).json({ 
-      success: true, 
-      message: "Data penanggung jawab (Guest) untuk reservasi ini berhasil diperbarui." 
-    });
+    const affectedRows = await reservationModel.updateGuestOfReservation(id, guest_id);
+    if (affectedRows === 0) {
+        return res.status(404).json({ success: false, message: "Reservasi tidak ditemukan atau tidak ada perubahan." });
+    }
+
+    return res.status(200).json({ success: true, message: "Penanggung jawab (Guest) reservasi berhasil diubah." });
   } catch (error) {
-    console.error("Error pada updateGuestOfReservation:", error);
-    return res.status(500).json({ 
-      success: false, 
-      message: "Gagal memperbarui guest reservasi." 
-    });
+    next(error);
   }
 };
 
-
-module.exports = { 
-  createNewReservation, 
-  getAllReservations, 
-  getReservationById,
-  updateGuestOfReservation
+module.exports = {
+    createReservation,
+    getAllReservations,
+    getReservationById,
+    updateGuestOfReservation
 };

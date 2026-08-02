@@ -1,191 +1,101 @@
 // /src/models/reservationModel.js
 
 const db = require('../config/db');
-const crypto = require('crypto');
+const genReservationCode = require('../utils/generateReservationCode');
 
+const reservationModel = {
 
-  
-const createReservation = async (guest_id, user_id, rooms) => {
-    // Start Connection
+  createReservation: async (guest_id, user_id, rooms) => {
     const connection = await db.getConnection();
-    
     try {
-        // Start Transaction
         await connection.beginTransaction();
 
-        // Generate Code Reservasi | Contoh: RES-9201-A3F9 
-        const randomString = crypto.randomBytes(2).toString('hex').toUpperCase();
-        const reservationCode = `RES-${Date.now().toString().slice(-4)}-${randomString}`;
+        // generate reservation code dengan function helper 
+        const reservation_code = genReservationCode('REV'); // contoh: REV-20260802-F0B4
 
-        // Insert ke table Utama: reservations
-        const [reservationResult] = await connection.query(
-            `INSERT INTO reservations (reservation_code, guest_id, user_id, status, payment_status) 
-            VALUES (?, ?, ?, 'pending', 'unpaid')`,
-            [reservationCode, guest_id, user_id]
+        // Insert ke tabel reservations (Parent)
+        const [resResult] = await connection.execute(
+            `INSERT INTO reservations (reservation_code, guest_id, user_id, status) 
+            VALUES (?, ?, ?, 'booked')`,
+            [reservation_code, guest_id, user_id]
         );
 
-        const reservationId = reservationResult.insertId; // Ambil reservasi id yang baru
+        const reservation_id = resResult.insertId;
 
-    // Proses detail kamar (reservation_rooms)
-    for (const item of rooms) {
-        const { room_type_id, quantity, check_in_date, check_out_date } = item;
-
-        // Ambil base_price dari table room_types untuk disimpan sebagai price_per_night
-        const [roomTypeRows] = await connection.query(
-            `SELECT base_price FROM room_types WHERE id = ? FOR UPDATE`,
-            [room_type_id]
-        );
-
-        if (!roomTypeRows[0]) {
-            throw new Error(`Tipe kamar dengan ID ${room_type_id} tidak ditemukan.`);
-        }
-
-        const pricePerNight = roomTypeRows[0].base_price;
-
-        // Cek jumlah kamar
-        const [totalPhysicalRooms] = await connection.query(
-            `SELECT COUNT(*) AS total FROM rooms WHERE room_type_id = ?`,
-            [room_type_id]
-        );
-        const maxCapacity = totalPhysicalRooms[0].total;
-
-        // Hitung kamar yang terbooking
-        const [bookedRooms] = await connection.query(
-            `SELECT COUNT(rr.id) AS booked_count
-            FROM reservation_rooms rr
-            WHERE rr.room_type_id = ? 
-            AND rr.room_status IN ('booked','checked_in')
-            AND (rr.check_in_date < ? AND rr.check_out_date > ?)`,
-            [room_type_id, check_out_date, check_in_date]
-        );
-
-        const currentBooked = bookedRooms[0].booked_count;
-
-        // Hitung kamar tersedia 
-        const availableQuota = maxCapacity - currentBooked;
-        
-        if (availableQuota < quantity) {
-            // Lempar error -> catch rollback
-            throw new Error(`Kamar untuk tipe ID ${room_type_id} tidak mencukupi. Sisa kuota: ${availableQuota}, diminta: ${quantity}`);
-        }
-
-        // Insert reservasi kamar satu persatu ke table reservation_rooms
-        for (let i = 0; i < quantity; i++) {
-            await connection.query(
-                `INSERT INTO reservation_rooms (reservation_id, room_type_id, room_id, check_in_date, check_out_date, room_status, price_per_night) 
-                VALUES (?, ?, NULL, ?, ?, 'booked', ?)`,
-                [reservationId, room_type_id, check_in_date, check_out_date, pricePerNight]
+        // Insert ke tabel reservation_rooms (Bisa lebih dari 1 kamar)
+        for (const room of rooms) {
+            await connection.execute(
+            `INSERT INTO reservation_rooms 
+            (reservation_id, room_type_id, room_id, price_per_night, check_in_date, check_out_date, total_adults, total_children, room_status) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'booked')`,
+            [
+                reservation_id, 
+                room.room_type_id, 
+                room.room_id || null, 
+                room.price_per_night, 
+                room.check_in_date, 
+                room.check_out_date, 
+                room.total_adults || 1, 
+                room.total_children || 0
+            ]
             );
         }
-    }
 
-    // Jika semua aman, commit transaksi ke database
-    await connection.commit();
-    return { success: true, reservationId, reservationCode };
+        await connection.commit();
+        return reservation_id;
 
     } catch (error) {
-        // Batalkan transaksi jika error
-        await connection.rollback();
-        throw error; 
+      await connection.rollback();
+      throw error;
+
     } finally {
-        // Close connection
-        connection.release();
+      connection.release();
     }
-}
+  },
 
-const getReservations = async () => {
-    const [rows] = await db.query(
-        `SELECT 
-        r.id AS reservation_id,
-        r.reservation_code,
-        r.guest_id,
-        g.name AS guest_name,
-        r.status,
-        r.payment_status,
-        r.total_price
-        JSON_ARRAYAGG(
-            JSON_OBJECT(
-                'room_type_id', rr.room_type_id,
-                'room_type_name', rt.name,
-                'room_id', rr.room_id,
-                'room_number', rm.room_number,
-                'price_per_night', rr.price_per_night,
-                'total_adults', rr.total_adults,
-                'total_children', rr.total_children
-            )
-        ) AS detail_reservations,
-        r.user_id
-        FROM reservations r
-        JOIN guests g ON r.guest_id = g.id
-        JOIN reservation_rooms rr ON r.id = rr.reservation_id
-        JOIN room_types rt ON rr.room_type_id = rt.id
-        LEFT JOIN rooms rm ON rr.room_id = rm.id
-        GROUP BY 
-        r.id, 
-        r.reservation_code, 
-        r.guest_id, 
-        g.name, 
-        r.user_id;`
-    );
+  // READ Ambil Semua Reservasi (Bisa ditambah filter nanti)
+  getReservations: async () => {
+    const query = `
+      SELECT r.id AS reservation_id, r.reservation_code, r.guest_id, g.name AS guest_name, r.status, r.payment_status 
+      FROM reservations r 
+      JOIN guests g ON r.guest_id = g.id
+      ORDER BY r.created_at DESC
+    `;
+    const [rows] = await db.query(query);
     return rows;
-}
+  },
 
-const getReservation = async (reservationId) => {
-    const [rows] = await db.query(
-        `SELECT 
-        r.id AS reservation_id,
-        r.reservation_code,
-        r.guest_id,
-        g.name AS guest_name,
-        r.total_price,
-        JSON_ARRAYAGG(
-            JSON_OBJECT(
-                'room_type_id', rr.room_type_id,
-                'room_type_name', rt.name,
-                'room_id', rr.room_id,
-                'room_number', rm.room_number,
-                'price_per_night', rr.price_per_night,
-                'total_adults', rr.total_adults,
-                'total_children', rr.total_children,
-                'room_status', rr.room_status,
-                'check_in_date', rr.check_in_date,
-                'check_out_date', rr.check_out_date,
-                'checked_in_at', rr.checked_in_at,
-                'checked_in_by', rr.check_in_by,
-                'checked_out_at', rr.checked_out_at,
-                'checked_out_by', rr.check_out_by
-            )
-        ) AS detail_reservations,
-        r.user_id
-        FROM reservations r
-        JOIN guests g ON r.guest_id = g.id
-        JOIN reservation_rooms rr ON r.id = rr.reservation_id
-        JOIN room_types rt ON rr.room_type_id = rt.id
-        LEFT JOIN rooms rm ON rr.room_id = rm.id
-        WHERE r.id = ?
-        GROUP BY 
-        r.id, 
-        r.reservation_code, 
-        r.guest_id, 
-        g.name, 
-        r.total_price,
-        r.user_id;`,
-        [reservationId]
+  // READ Ambil Detail Reservasi (JOIN yang sudah Anda siapkan)
+  getReservation: async (reservationId) => {
+    const query = `
+      SELECT r.id AS reservation_id, r.reservation_code, r.guest_id, g.name AS guest_name, r.status,
+      JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'room_type_id', rr.room_type_id, 
+          'room_id', rr.room_id, 
+          'room_status', rr.room_status,
+          'check_in_date', rr.check_in_date, 
+          'check_out_date', rr.check_out_date
+        )
+      ) AS detail_reservations 
+      FROM reservations r 
+      JOIN guests g ON r.guest_id = g.id 
+      LEFT JOIN reservation_rooms rr ON r.id = rr.reservation_id 
+      WHERE r.id = ?
+      GROUP BY r.id, r.reservation_code, r.guest_id, g.name, r.status
+    `;
+    const [rows] = await db.query(query, [reservationId]);
+    return rows[0];
+  },
+
+  // UPDATE ubah Penanggung Jawab Reservasi (Guest)
+  updateGuestOfReservation: async (reservationId, newGuestId) => {
+    const [result] = await db.execute(
+      `UPDATE reservations SET guest_id = ? WHERE id = ?`,
+      [newGuestId, reservationId]
     );
-    return rows[0] || null;
-}
-
-const updateReservationGuest = async (reservationId, newGuestId) => {
-  const [result] = await db.query(
-    `UPDATE reservations SET guest_id = ? WHERE id = ?`,
-    [newGuestId, reservationId]
-  );
-  return result;
+    return result.affectedRows;
+  }
 };
 
-module.exports = {
-  createReservation,
-  getReservations,
-  getReservation,
-  updateReservationGuest
-};
+module.exports = reservationModel;
