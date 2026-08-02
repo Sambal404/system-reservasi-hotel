@@ -1,86 +1,112 @@
 // /src/controllers/guestControllers
 
-const pool = require("../config/db");
+const guestModel = require('../models/guestModel');
 
-//get/api/guest
+
+// GET /api/guests?search=...&page=1&limit=20
 const getGuest = async (req, res, next) =>{
     try {
-        const [rows] = await pool.execute("SELECT * FROM guests ORDER BY id DESC");
+        const { search } = req.query;
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 20;
+        const offset = (page -1) * limit;
 
-        // Debug 
+        const { rows, total, male, female } = await guestModel.getAllGuests({
+            search,
+            limit,
+            offset
+        })
         res.json({
             success: true,
-            data: rows
+            data: rows,
+            summary: {
+                total,
+                male,
+                female,
+            }
         });
     }catch (err) { 
         next (err);
     }
 };
 
-//get/api/guest/id
-const getGuestById = async (req, res, next) =>{
-    try{
-        const id = parseInt(req.params.id, 10);
-        const [rows] = await pool.execute("SELECT * FROM guests WHERE id = ?", [id]);
-        if(rows.length === 0 ) return res.status(404).json({message: "Data Tamu tidak ditemukan"});
-        res.json(rows[0]);
-    } catch (err) {
-        next (err);
+
+// GET /api/guests/:id
+const getGuestById = async (req, res, next) => {
+  try {
+    const id = parseInt(req.params.id, 10);
+    const guest = await guestModel.getGuestById(id);
+
+    if (!guest) {
+        return res.status(404).json({
+            success: false,
+            message: 'Data tamu tidak ditemukan',
+        });
     }
+
+    return res.json({
+        success: true,
+        data: guest,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-//post/api/guest (protected)
-const createGuest = async (req, res, next) =>{
-    try{
-        const {name, gender, identity_type, identity_number, phone, email} = req.body;
-        const [result] = await pool.execute(
-            "INSERT INTO guests (name, gender, identity_type, identity_number, phone, email) values (?, ?, ?, ?, ?, ?) ", [name, gender, identity_type, identity_number, phone, email || null]
-        );
-        res.status(201).json({ id: result.insertId, name, gender, identity_type, identity_number, phone, email});
-    } catch (err){
-        next(err);
-    }
-};
 
-//put/api/guest/id (protected)
-const updateGuest = async(req, res, next) =>{
+// POST /api/guest (protected)
+const createGuest = async (req, res, next) => {
     try {
-        const id = parseInt(req.params.id, 10);
-        const {name, gender, identity_type, identity_number, phone, email} = req.body;
-
-        //build dynamic update (simple)
-        const fields = [];
-        const values = [];
-        if ( name !== undefined) {fields.push("name=?"); values.push(name); }
-        if ( gender !== undefined) {fields.push("gender=?"); values.push(gender); }
-        if ( identity_type !== undefined) {fields.push("identity_type=?"); values.push(identity_type); }
-        if ( identity_number !== undefined) {fields.push("identity_number=?"); values.push(identity_number); }
-        if ( phone !== undefined) {fields.push("phone=?"); values.push(phone); }
-        if ( email !== undefined) {fields.push("email=?"); values.push(email); }
-
-        if (fields.length === 0 ) return res.status(400).json({message: "Tidak ada yang diupdate"});
-
-        values.push(id);
-        const sql = `UPDATE guests SET ${fields.join(",")} WHERE id = ?`;
-        const [result] = await pool.execute(sql, values);
-
-        if (result.affectedRows === 0) return res.status (404).json({message: "Tidak ada data tamu"});
-        res.json({message: "Data tamu berhasil diperbaharui!"});
-    }catch (err){
-        next(err);
+        const newGuestId = await guestModel.createGuest(req.body);
+    
+        return res.status(201).json({
+            success: true,
+            message: 'Berhasil menambahkan data tamu baru',
+            data: {
+            id: newGuestId,
+            ...req.body,
+            }
+        });
+    } catch (err) {
+      next(err);
     }
 };
 
-//delete/api/guest/id (protected)
-    const deleteGuest = async (req,res,next)=>{
-        try{
-            const id = parseInt(req.params.id, 10);
-            const [result] = await pool.execute("DELETE FROM guests WHERE id = ?", [id]);
-            if (result.affectedRows === 0) return res.status(401).json({message: "Tidak ada data tamu"});
-            res.json({message: "Data tamu berhasil dihapus"});
-        }catch (err){
-            next (err);
-        };
-    };
 
-    module.exports = { getGuest, getGuestById, createGuest, updateGuest, deleteGuest};
+// PUT /api/guest/:id (protected)
+const updateGuest = async (req, res, next) => {
+    try {
+      const id = parseInt(req.params.id, 10);
+      const affected = await guestModel.updateGuest(id, req.body);
+  
+      if (affected === 0) {
+        return res.status(404).json({
+          success: false,
+          message: 'Data tamu tidak ditemukan',
+        });
+      }
+  
+      return res.json({
+        success: true,
+        message: 'Berhasil memperbarui data tamu',
+      });
+    } catch (err) {
+      next(err);
+    }
+};
+
+
+// Delete /api/guest/id (protected)
+const deleteGuest = async (req,res,next)=>{
+    try{
+        const id = parseInt(req.params.id, 10);
+        const [result] = await pool.execute("DELETE FROM guests WHERE id = ?", [id]);
+        if (result.affectedRows === 0) return res.status(401).json({message: "Tidak ada data tamu"});
+        res.json({message: "Data tamu berhasil dihapus"});
+    }catch (err){
+        next (err);
+    };
+};
+
+
+module.exports = { getGuest, getGuestById, createGuest, updateGuest, deleteGuest};
