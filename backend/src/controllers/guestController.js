@@ -1,3 +1,5 @@
+// /src/controllers/guestControllers
+
 const pool = require("../config/db");
 
 //get/api/guest

@@ -1,3 +1,5 @@
+// /src/models/reservationRoomsModel.js
+
 const db = require('../config/db');
 
 // Get All Reservation Rooms
@@ -22,13 +24,14 @@ const getAllReservationRooms = async () => {
 };
 
 // Check-in
-const checkInRoom = async (reservationRoomId, userId) => {
+const checkInRoom = async (reservationRoomId, roomId, userId) => {
     const connection = await db.getConnection();
     try {
         await connection.beginTransaction();
 
+        // Ambil data reservation_room untuk verifikasi
         const [roomDetail] = await connection.query(
-            `SELECT reservation_id, room_id, room_status FROM reservation_rooms WHERE id = ? FOR UPDATE`,
+            `SELECT reservation_id, room_status FROM reservation_rooms WHERE id = ? FOR UPDATE`,
             [reservationRoomId]
         );
 
@@ -36,45 +39,52 @@ const checkInRoom = async (reservationRoomId, userId) => {
             throw new Error('Data kamar reservasi tidak ditemukan.');
         }
 
-        const { reservation_id, room_id, room_status } = roomDetail[0];
+        const { reservation_id, room_status } = roomDetail[0];
 
         if (room_status !== 'booked') {
             throw new Error('Kamar tidak dalam status booked.');
         }
 
-        if (!room_id) {
-            throw new Error('Nomor kamar fisik (room_id) belum ditentukan, tidak dapat melakukan check-in.');
+        // Cek apakah kamar fisik (rooms) yang dipilih valid dan tersedia
+        const [roomCheck] = await connection.query(
+            `SELECT id, status FROM rooms WHERE id = ? FOR UPDATE`,
+            [roomId]
+        );
+
+        if (roomCheck.length === 0) {
+            throw new Error('Nomor kamar fisik tidak ditemukan di database.');
         }
 
-        // Update status reservation_room jadi checked_in
-        const [updateResRoom] = await connection.query(
+        if (roomCheck[0].status !== 'available' || roomCheck[0].clean_status !== 'clean') {
+            throw new Error('Kamar fisik yang dipilih sedang tidak tersedia.');
+        }
+
+        // Update status reservation_room, masukkan room_id yang diinput, catat waktu & user check-in
+        await connection.query(
             `UPDATE reservation_rooms 
-             SET room_status = 'checked_in', 
+             SET room_id = ?,
+                 room_status = 'checked_in', 
                  checked_in_at = NOW(), 
                  checked_in_by = ? 
              WHERE id = ?`,
-            [userId, reservationRoomId]
+            [roomId, userId, reservationRoomId]
         );
 
-        if (updateResRoom.affectedRows === 0) {
-            throw new Error('Gagal memperbarui status kamar reservasi.');
-        }
-
-        // Update status reservations utama menjadi 'active'
+        // 4. Update status reservations utama menjadi 'active'
         await connection.query(
             `UPDATE reservations SET status = 'active' WHERE id = ?`,
             [reservation_id]
         );
 
-        // Update status fisik rooms menjadi 'occupied'
+        // 5. Update status fisik rooms menjadi 'occupied'
         await connection.query(
             `UPDATE rooms SET status = 'occupied' WHERE id = ?`,
-            [room_id]
+            [roomId]
         );
 
         await connection.commit();
         connection.release();
-        return true;
+        return reservation_id;
 
     } catch (error) {
         await connection.rollback();
@@ -117,7 +127,7 @@ const checkOutRoom = async (reservationRoomId, userId) => {
         // Update status fisik rooms menjadi 'available' dan clean_status menjadi 'dirty'
         if (room_id) {
             await connection.query(
-                `UPDATE rooms SET status = 'available' clean_status = 'dirty' WHERE id = ?`,
+                `UPDATE rooms SET status = 'available', clean_status = 'dirty' WHERE id = ?`,
                 [room_id]
             );
         }
@@ -140,7 +150,7 @@ const checkOutRoom = async (reservationRoomId, userId) => {
 
         await connection.commit();
         connection.release();
-        return true;
+        return reservation_id;
 
     } catch (error) {
         await connection.rollback();

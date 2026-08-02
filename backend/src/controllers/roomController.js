@@ -1,3 +1,5 @@
+// /src/controllers/roomController.js
+
 const roomModel = require("../models/roomModel").default;
 
 const getRooms = async (req, res) => {

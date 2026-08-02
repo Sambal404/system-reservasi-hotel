@@ -1,3 +1,5 @@
+// /src/models/roomModel.js
+
 const db = require("../config/db");
 
 const getAllRooms = async ({ status, roomTypeId, search }) => {

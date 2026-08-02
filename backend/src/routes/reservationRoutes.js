@@ -1,3 +1,5 @@
+// /src/routes/reservationRoutes.js
+
 const express = require("express");
 const router = express.Router();
 const { createNewReservation, getAllReservations, getReservationById } = require('../controllers/reservationController');
