@@ -175,8 +175,17 @@ const getReservation = async (reservationId) => {
     return rows[0] || null;
 }
 
+const updateReservationGuest = async (reservationId, newGuestId) => {
+  const [result] = await db.query(
+    `UPDATE reservations SET guest_id = ? WHERE id = ?`,
+    [newGuestId, reservationId]
+  );
+  return result;
+};
+
 module.exports = {
-    createReservation,
-    getReservations,
-    getReservation
-}
+  createReservation,
+  getReservations,
+  getReservation,
+  updateReservationGuest
+};

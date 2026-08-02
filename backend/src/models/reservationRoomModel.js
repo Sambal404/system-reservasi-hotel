@@ -1,4 +1,4 @@
-// /src/models/reservationRoomsModel.js
+// /src/models/reservationRoomModel.js
 
 const db = require('../config/db');
 
@@ -176,9 +176,36 @@ const updateReservationRoomById = async (reservationRoomId, data) => {
     return result.affectedRows;
 };
 
+// Fast Version (not safe)
+// CREATE: Menambahkan kamar baru ke dalam reservasi yang sudah ada
+const addRoomToReservation = async (data) => {
+  const { reservation_id, room_type_id, room_id, price_per_night, check_in_date, check_out_date, total_adults, total_children } = data;
+  
+  // Status otomatis 'booked' saat baru dibuat
+  const [result] = await db.query(
+    `INSERT INTO reservation_rooms 
+    (reservation_id, room_type_id, room_id, price_per_night, check_in_date, check_out_date, total_adults, total_children, room_status) 
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'booked')`,
+    [reservation_id, room_type_id, room_id || null, price_per_night, check_in_date, check_out_date, total_adults || 1, total_children || 0]
+  );
+  
+  return result.insertId;
+};
+
+// Soft Delete
+const cancelReservationRoomById = async (reservationRoomId) => {
+  const [result] = await db.query(
+    `UPDATE reservation_rooms SET room_status = 'canceled' WHERE id = ?`,
+    [reservationRoomId]
+  );
+  return result;
+};
+
 module.exports = {
-    getAllReservationRooms,
-    checkInRoom,
-    checkOutRoom,
-    updateReservationRoomById
+  getAllReservationRooms,
+  checkInRoom,
+  checkOutRoom,
+  updateReservationRoomById,
+  addRoomToReservation,
+  cancelReservationRoomById
 };

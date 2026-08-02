@@ -84,8 +84,38 @@ const getReservationById = async (req, res) => {
     }
 }
 
-module.exports = {
-    createNewReservation,
-    getAllReservations,
-    getReservationById
-}
+
+const updateGuestOfReservation = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { guest_id } = req.body;
+
+    if (!guest_id) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Data guest_id baru wajib dikirimkan." 
+      });
+    }
+
+    await updateReservationGuest(id, guest_id);
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: "Data penanggung jawab (Guest) untuk reservasi ini berhasil diperbarui." 
+    });
+  } catch (error) {
+    console.error("Error pada updateGuestOfReservation:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Gagal memperbarui guest reservasi." 
+    });
+  }
+};
+
+
+module.exports = { 
+  createNewReservation, 
+  getAllReservations, 
+  getReservationById,
+  updateGuestOfReservation
+};
