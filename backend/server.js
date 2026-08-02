@@ -1,51 +1,69 @@
-// server.js //
+// /server.js 
+
 
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
-// ROUTES
-const authRoutes = require('./src/routes/authRoutes');
-const dashboardRoutes = require('./src/routes/dashboardRoutes')
-const guestRoutes = require("./src/routes/guestRoutes");
-const roomRoutes = require("./src/routes/roomRoutes");
-const reservationRoutes = require('./src/routes/reservationRoutes');
-const reservationRoomRoutes = require('./src/routes/reservationRoomRoutes');
 
+// Load .env
 dotenv.config();
+
+// Express
 const app = express();
 
-app.use(cors()); // buka untuk semua
+
+// Routes
+const authRoutes = require('./src/routes/authRoutes');
+const dashboardRoutes = require('./src/routes/dashboardRoutes');
+const guestRoutes = require('./src/routes/guestRoutes');
+const roomRoutes = require('./src/routes/roomRoutes');
+const reservationRoutes = require('./src/routes/reservationRoutes');
+// const usersRoutes = require('./src/routes/userRoutes');
+
+
+// Middlewares express & cors
+app.use(cors()) // Sementara buka untuk semua (dev mode)
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.urlencoded({ extended: true })) // hanya untuk testing cepat ( html murni tanpa react frontend)
 
 
-// Auth routes
-app.use('/api/auth', authRoutes);
-// Dashboard routes
-app.use('/api/dashboard', dashboardRoutes);
-// Guests routes
-app.use("/api/guests", guestRoutes);
-// Room routes
-app.use('/api/rooms', roomRoutes);
-// Reservation routes
-app.use('/api/reservations', reservationRoutes);
-// Reservation Rooms routes
-app.use('/api/reservation-rooms', reservationRoomRoutes);
+// ============
+// == API V1 ==
+// ============
+// Auth Routes
+app.use('/api/v1/auth', authRoutes);
+// Dashboard Routes
+app,use('/api/v1/dashboard', dashboardRoutes);
+// Guests Routes
+app.use('/api/v1/guests', guestRoutes);
+// Rooms Routes
+app.use('/api/v1/rooms', roomRoutes);
+// Reservations Routes
+app.use('/api/v1/reservations', reservationRoutes);
+// Uers Routes
+// app.use('/api/v1/users', userRoutes);
 
 
-// basic error handler
-app.use((err, req, res, next) => {
+// Global Error Handler
+app.use(( err, req, next ) => {
   console.log(err);
   res
-    .status(err.status || 500)
-    .json({ error: err.message || "Internal Server Error" });
+    .status( err.status || 500 )
+    .json( { 
+      success: false,
+      error: err.message || "Internal Server Error"
+    });
 });
 
 const PORT = process.env.PORT || 3000;
+
 app.get("/", (req, res) => {
-  res.json({ message: "API Sistem Reservasi Hotel Berjalan Normal" });
+  res.json({
+    message: "API Grand Nusantara Hotel Running Normal"
+  });
 });
+
 app.listen(PORT, () => {
-  console.log(`Server berjalan pada port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
