@@ -18,5 +18,10 @@ router.post('/',verifyToken, verifyRole(['admin','staff']), validateReservation,
 router.get('/:id', getReservationById);
 router.patch('/:id/guest', verifyToken, verifyRole(['admin','staff']), updateGuestOfReservation);
 
+// Endpoint reservation_rooms
+// check in check out
+const reservationRoomRoutes = require('./reservationRoomRoutes');
+router.use('/:id/rooms', reservationRoomRoutes);
+
 module.exports = router;
 

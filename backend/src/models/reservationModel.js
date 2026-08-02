@@ -53,45 +53,66 @@ const reservationModel = {
     }
   },
 
-  // READ Ambil Semua Reservasi (Bisa ditambah filter nanti)
-  getReservations: async () => {
-    const query = `
-      SELECT r.id AS reservation_id, r.reservation_code, r.guest_id, g.name AS guest_name, r.status, r.payment_status 
-      FROM reservations r 
-      JOIN guests g ON r.guest_id = g.id
-      ORDER BY r.created_at DESC
-    `;
-    const [rows] = await db.query(query);
-    return rows;
-  },
+    // READ Ambil Semua Reservasi (Bisa ditambah filter nanti)
+    getReservations: async () => {
+        const query = `
+        SELECT r.id AS reservation_id, r.reservation_code, r.guest_id, g.name AS guest_name, r.status, r.payment_status 
+        FROM reservations r 
+        JOIN guests g ON r.guest_id = g.id
+        ORDER BY r.created_at DESC
+        `;
+        const [rows] = await db.query(query);
+        return rows;
+    },
 
-  // READ Ambil Detail Reservasi (JOIN yang sudah Anda siapkan)
-  getReservation: async (reservationId) => {
-    const query = `
-      SELECT r.id AS reservation_id, r.reservation_code, r.guest_id, g.name AS guest_name, r.status,
-      JSON_ARRAYAGG(
-        JSON_OBJECT(
-          'room_type_id', rr.room_type_id, 
-          'room_id', rr.room_id, 
-          'room_status', rr.room_status,
-          'check_in_date', rr.check_in_date, 
-          'check_out_date', rr.check_out_date
-        )
-      ) AS detail_reservations 
-      FROM reservations r 
-      JOIN guests g ON r.guest_id = g.id 
-      LEFT JOIN reservation_rooms rr ON r.id = rr.reservation_id 
-      WHERE r.id = ?
-      GROUP BY r.id, r.reservation_code, r.guest_id, g.name, r.status
-    `;
-    const [rows] = await db.query(query, [reservationId]);
-    return rows[0];
-  },
+    // READ Ambil Data Reservasi
+    getReservations: async ({ search, status, limit = 20, offset = 0 } = {}) => {
+        let query = `
+            SELECT 
+                r.id AS reservation_id,
+                r.reservation_code,
+                r.guest_id,
+                g.name AS guest_name, 
+                g.phone AS guest_phone, 
+                r.status, 
+                r.payment_status, 
+                r.created_at
+            FROM reservations r 
+            JOIN guests g ON r.guest_id = g.id 
+            WHERE 1=1
+        `;
+        
+        const queryParams = [];
+
+        // Filter berdasarkan Pencarian (Kode reservasi atau Nama tamu)
+        if (search) {
+        const searchKeyword = `%${search}%`;
+            query += ` AND (r.reservation_code LIKE ? OR g.name LIKE ?)`;
+            queryParams.push(searchKeyword, searchKeyword);
+        }
+
+        // Filter berdasarkan Status Reservasi
+        if (status) {
+            query += ` AND r.status = ?`;
+            queryParams.push(status);
+        }
+
+        // Urutan dan Pagination
+        query += ` ORDER BY r.created_at DESC LIMIT ? OFFSET ?`;
+        queryParams.push(Number(limit), Number(offset));
+
+        // Eksekusi kueri data dan kueri total hitungan data
+        const [rows] = await db.query(query, queryParams);
+
+        return rows;
+    },
 
   // UPDATE ubah Penanggung Jawab Reservasi (Guest)
   updateGuestOfReservation: async (reservationId, newGuestId) => {
     const [result] = await db.execute(
-      `UPDATE reservations SET guest_id = ? WHERE id = ?`,
+      `UPDATE reservations 
+      SET guest_id = ? 
+      WHERE id = ?`,
       [newGuestId, reservationId]
     );
     return result.affectedRows;

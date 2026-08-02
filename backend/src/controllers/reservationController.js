@@ -14,6 +14,33 @@
 const reservationModel = require('../models/reservationModel');
 
 
+// GET /api/reservations
+const getAllReservations = async (req, res, next) => {
+  try {
+    const { search, status } = req.query;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.limit, 10) || 20;
+    const offset = (page - 1) * limit;
+
+    const result = await reservationModel.getReservations({
+      search,
+      status,
+      limit,
+      offset
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Berhasil mengambil daftar reservasi",
+      data: result
+    });
+    
+  } catch (error) {
+    next(error);
+  }
+};
+
+
 // POST /api/reservations
 const createReservation = async (req, res, next) => {
   try {
@@ -31,18 +58,6 @@ const createReservation = async (req, res, next) => {
     next(error);
   }
 };
-
-
-// GET /api/reservations
-const getAllReservations = async (req, res, next) => {
-  try {
-    const reservations = await reservationModel.getReservations();
-    return res.status(200).json({ success: true, data: reservations });
-  } catch (error) {
-    next(error);
-  }
-};
-
 
 
 // GET /api/reservations/:id

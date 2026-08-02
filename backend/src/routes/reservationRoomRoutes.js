@@ -11,6 +11,7 @@ const {
     createReservationRoom,
     cancelReservationRoom 
   } = require('../controllers/reservationRoomController');
+  
 const { verifyToken, verifyRole } = require('../middlewares/auth');
 
 router.get('/', verifyToken, getReservationRooms);
