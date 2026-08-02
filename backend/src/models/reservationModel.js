@@ -108,15 +108,52 @@ const reservationModel = {
     },
 
   // UPDATE ubah Penanggung Jawab Reservasi (Guest)
-  updateGuestOfReservation: async (reservationId, newGuestId) => {
-    const [result] = await db.execute(
-      `UPDATE reservations 
-      SET guest_id = ? 
-      WHERE id = ?`,
-      [newGuestId, reservationId]
-    );
-    return result.affectedRows;
-  }
+    updateGuestOfReservation: async (reservationId, newGuestId) => {
+        const [result] = await db.execute(
+            `UPDATE reservations 
+            SET guest_id = ? 
+            WHERE id = ?`,
+        [newGuestId, reservationId]
+        );
+        return result.affectedRows;
+    },
+
+
+    // DELETE soft delete (cancel reeservations)
+    cancelReservation: async (reservationId) => {
+        const connection = await db.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            // Update status reservation (parent) menjadi canceled
+            const [resResult] = await connection.query(
+                `UPDATE reservations SET status = 'canceled' WHERE id = ?`,
+                [reservationId]
+            );
+
+            if (resResult.affectedRows === 0) {
+                await connection.rollback();
+                return { success: false, message: "Reservasi tidak ditemukan" };
+            }
+
+            // Update reservation_rooms (child) status menjadi canceled
+            await connection.query(
+            `UPDATE reservation_rooms SET room_status = 'canceled' WHERE reservation_id = ? AND room_status != 'checked_out'`,
+            [reservationId]
+            );
+
+            await connection.commit();
+            return { 
+                success: true, 
+                message: "Reservasi berhasil dibatalkan" 
+            };
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
+    }
 };
 
 module.exports = reservationModel;

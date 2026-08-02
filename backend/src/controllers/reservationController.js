@@ -34,7 +34,7 @@ const getAllReservations = async (req, res, next) => {
       message: "Berhasil mengambil daftar reservasi",
       data: result
     });
-    
+
   } catch (error) {
     next(error);
   }
@@ -98,9 +98,34 @@ const updateGuestOfReservation = async (req, res, next) => {
   }
 };
 
+// DELETE /api/reservations/:id (Soft Delete / Batalkan Reservasi)
+const cancelReservation = async (req, res, next) => {
+    try {
+    const { id } = req.params;
+    const reservationId = parseInt(id, 10);
+
+    const result = await reservationModel.cancelReservation(reservationId);
+
+    if (!result.success) {
+        return res.status(404).json({
+            success: false,
+            message: result.message
+        });
+    }
+
+    return res.status(200).json({
+        success: true,
+        message: result.message
+    });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createReservation,
     getAllReservations,
     getReservationById,
-    updateGuestOfReservation
+    updateGuestOfReservation,
+    cancelReservation
 };
