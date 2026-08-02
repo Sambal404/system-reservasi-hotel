@@ -1,39 +1,93 @@
 // /src/controllers/roomController.js
+const roomModel = require('../models/roomModel');
 
-const roomModel = require("../models/roomModel").default;
-
-const getRooms = async (req, res) => {
+// GET /api/rooms
+const getAllRooms = async (req, res, next) => {
   try {
-    const { status, roomTypeId, search } = req.query;
-    const rooms = await roomModel.getAllRooms({ status, roomTypeId, search });
-    return res.json({ success: true, data: rooms });
+    const { status, roomTypeId, search, date } = req.query;
+    const rooms = await roomModel.getAllRooms({ status, roomTypeId, search, date });
+
+    return res.status(200).json({
+      success: true,
+      message: "Berhasil mengambil daftar kamar",
+      data: rooms
+    });
   } catch (err) {
-    console.error("Error getRooms:", err);
-    return res
-      .status(500)
-      .json({ success: false, message: "Gagal mengambil data kamar" });
+    next(err);
   }
 };
 
-const getRoom = async (req, res) => {
+// GET /api/rooms/available (Pencarian kamar kosong) 
+const getAvailableRooms = async (req, res, next) => {
+  try {
+    const { checkInDate, checkOutDate, roomTypeId } = req.query;
+
+    if (!checkInDate || !checkOutDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Tanggal checkInDate dan checkOutDate wajib diisi."
+      });
+    }
+
+    const availableRooms = await roomModel.getAvailableRooms({
+      checkInDate,
+      checkOutDate,
+      roomTypeId
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Berhasil mengambil daftar kamar yang tersedia untuk tanggal yang dipilih",
+      data: availableRooms
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// GET /api/rooms/available-today 
+const getAvailableRoomsToday = async (req, res, next) => {
+  try {
+    const { roomTypeId } = req.query;
+
+    const availableRoomsToday = await getAvailableRoomsTodayFast({ roomTypeId });
+
+    return res.status(200).json({
+      success: true,
+      message: "Berhasil mengambil daftar kamar siap huni (kosong & bersih) untuk hari ini",
+      data: availableRoomsToday
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+// GET /api/rooms/:id
+const getRoomById = async (req, res, next) => {
   try {
     const { id } = req.params;
     const room = await roomModel.getRoomById(id);
+
     if (!room) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Kamar tidak ditemukan" });
+      return res.status(404).json({
+        success: false,
+        message: "Kamar tidak ditemukan"
+      });
     }
-    return res.json({ success: true, data: room });
+
+    return res.status(200).json({
+      success: true,
+      message: "Berhasil mengambil detail kamar",
+      data: room
+    });
   } catch (err) {
-    console.error("Error getRoom:", err);
-    return res
-      .status(500)
-      .json({ success: false, message: "Gagal mengambil data kamar" });
+    next(err);
   }
 };
 
-module.exports.default = {
-  getRooms,
-  getRoom,
+module.exports = {
+  getAllRooms,
+  getAvailableRooms,
+  getAvailableRoomsToday,
+  getRoomById
 };
