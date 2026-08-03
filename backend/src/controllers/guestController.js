@@ -1,7 +1,7 @@
 // /src/controllers/guestControllers
 
 const guestModel = require('../models/guestModel');
-
+const pool = require('../config/db');
 
 // GET /api/guests?search=...&page=1&limit=20
 const getGuest = async (req, res, next) =>{
