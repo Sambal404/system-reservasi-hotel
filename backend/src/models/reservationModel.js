@@ -153,6 +153,43 @@ const reservationModel = {
         } finally {
             connection.release();
         }
+    },
+
+    // Cek ketersediaan kamar berdasarkan type
+    checkRoomTypeAvailability: async (roomTypeId, checkInDate, checkOutDate, quantity = 1) => {
+        const query = `
+            SELECT COUNT(r.id) AS available_count
+            FROM rooms r
+            WHERE r.room_type_id = ? 
+            AND r.status != 'maintenance'
+            AND r.id NOT IN (
+                SELECT rr.room_id 
+                FROM reservation_rooms rr 
+                WHERE rr.room_id IS NOT NULL 
+                    AND rr.room_status IN ('booked', 'checked_in') 
+                    AND (? < rr.check_out_date AND ? > rr.check_in_date)
+            );
+        `
+        const [rows] = await db.query(
+            query, [
+                roomTypeId,
+                check_in_date,
+                check_out_date
+            ]);
+        const availableStock = rows[0].available_count;
+        
+        // Cek ketersediaan
+        if (quantity > availableStock) {
+            return  {
+                available: false,
+                available_stock: availableStock,
+            }
+        }
+
+        return  {
+            available: true,
+            available_stock: availableStock,
+        }
     }
 };
 
