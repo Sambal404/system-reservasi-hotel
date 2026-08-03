@@ -1,3 +1,5 @@
+// /src/routes/guestRoutes.js
+
 const express = require ("express");
 const router = express.Router();
 
@@ -11,8 +13,8 @@ const {verifyToken, verifyRole}= require ("../middlewares/auth");
 const {validateGuestCreate, validateGuestUpdate} = require ("../middlewares/validations/guestValidation");
 
 //publik - ga perlu token
-router.get("/", getGuest);
-router.get("/:id", getGuestById);
+router.get("/", verifyToken, getGuest);
+router.get("/:id", verifyToken, getGuestById);
 
 //protected - perlu token, ini ngelewatin middleware auth dulu
 router.post("/",  verifyToken, validateGuestCreate, createGuest);

@@ -2,6 +2,8 @@
 --  DATABASE HOTEL ===
 -- =============== ===
 
+DROP DATABASE IF EXISTS hotel_db;
+
 CREATE DATABASE IF NOT EXISTS hotel_db;
 USE hotel_db;
 
@@ -82,6 +84,7 @@ CREATE TABLE IF NOT EXISTS rooms (
     room_type_id INT NOT NULL,
     room_number VARCHAR(10) NOT NULL UNIQUE,
     status ENUM('available','occupied','maintenance') DEFAULT 'available', 
+    clean_status ENUM('clean','dirty') DEFAULT 'clean',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (room_type_id) REFERENCES room_types(id) ON DELETE RESTRICT,

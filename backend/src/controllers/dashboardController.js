@@ -1,6 +1,6 @@
 // /src/controllers/dashboardController.js
 
-const DashboardModel = require('../models/dashboardModel');
+const dashboardModel = require('../models/dashboardModel');
 
 // Variabel global untuk menyimpan semua koneksi browser yang sedang aktif
 let clients = [];
@@ -30,13 +30,13 @@ const broadcastDashboardUpdate = () => {
     });
 };
 
-const getDashboardData = async (req, res) => { 
+const getDashboardData = async (req, res, next) => { 
     try {
-        const roomSummary = await DashboardModel.getRoomSummary();
-        const reservationSummary = await DashboardModel.getReservationSummary();
-        const guestSummary = await DashboardModel.getGuestSummary();
-        const dailySummary = await DashboardModel.getDailySummary(7); // log 7 hari
-        const recentReservations = await DashboardModel.getRecentReservations();
+        const roomSummary = await dashboardModel.getRoomSummary();
+        const reservationSummary = await dashboardModel.getReservationSummary();
+        const guestSummary = await dashboardModel.getGuestSummary();
+        const dailySummary = await dashboardModel.getDailySummary(7); // log 7 hari
+        const recentReservations = await dashboardModel.getRecentReservations(10);
 
         // Debug log
         console.log("Room Summary:", roomSummary);
@@ -55,8 +55,9 @@ const getDashboardData = async (req, res) => {
                 recent_reservations: recentReservations
             }
         });
-    } catch (error) {
-        console.log(error);
+    } catch (err) {
+        console.error("Error pada auth /api/v1/dashboard :", err);
+        next(err);
     }
 };
 

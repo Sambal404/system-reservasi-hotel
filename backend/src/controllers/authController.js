@@ -1,57 +1,37 @@
+// /src/controllers/authController.js
+
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const db = require("../config/db");
+
+// authModel untuk query
+const authModel = require("../models/authModel");
 
 const applicationName = process.env.APP_NAME || "Front Office POS";
 
 /**
  * Fitur login auth karyawan
- * POST /api/auth/login
+ * POST /api/v1/auth/login
  */
-
-const Login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
 
-    const query = `
-      SELECT
-        u.id AS user_id,
-        u.username,
-        u.password AS hashed_password,
-        u.is_active AS is_user_active,
-        e.id AS employee_id,
-        e.full_name,
-        e.email,
-        e.position_id,
-        p.name AS employee_position,
-        app.id AS application_id,
-        app.name AS application_name,
-        au.role
-      FROM users u
-      JOIN employees e ON u.employee_id = e.id
-      JOIN positions p ON e.position_id = p.id
-      JOIN application_users au ON u.id = au.user_id
-      JOIN applications app ON au.application_id = app.id
-      WHERE
-        u.username = ? AND
-        app.name = ?
-      LIMIT 1
-    `;
+    const user = await authModel.findUserForLogin(username, applicationName);
 
-    const [rows] = await db.execute(query, [username, applicationName]);
-    
-    // Verifikasi username, app, password
-    if (!rows[0]) {
-      return res.status(401).json({ success: false, message: "Login gagal" });
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Login gagal: Username atau aplikasi tidak sesuai" });
     }
 
-    const user = rows[0];
-
+    // Verifikasi Password
     const isPasswordValid = await bcrypt.compare(password, user.hashed_password);
-    if (!isPasswordValid || !user.is_user_active) {
-      return res.status(401).json({ success: false, message: "Login gagal" });
+    if (!isPasswordValid) {
+      return res.status(401).json({ success: false, message: "Login gagal: Password salah" });
     }
 
+    // Update is_active menjadi TRUE 
+    await authModel.updateUserActiveStatus(user.user_id, true);
+
+    // Generate Payload JWT
     const payload = {
       userId: user.user_id,
       employeeId: user.employee_id,
@@ -85,13 +65,59 @@ const Login = async (req, res) => {
         },
       },
     });
-  } catch (error) {
-    console.error("Error pada auth login", error);
-    return res.status(500).json({
-      success: false,
-      message: "Terjadi kesalahan pada server",
-    });
+  } catch (err) {
+    console.error("Error pada auth /api/v1/auth/login : ", err);
+    next(err);
   }
 };
 
-module.exports = Login;
+/**
+ * Fitur ambil data profil user yang sedang login
+ * GET /api/v1/auth/me
+ */
+const getMe = async (req, res, next) => {
+  try {
+    const userId = req.user.userId; // Diambil dari middleware verifyToken
+
+    const user = await authModel.findUserById(userId);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User tidak ditemukan" });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: user,
+    });
+  } catch (err) {
+    console.error("Error pada auth /api/v1/auth/me : ", err);
+    next(err);
+  }
+};
+
+/**
+ * Fitur logout user
+ * POST /api/v1/auth/logout
+ */
+const logout = async (req, res, next) => {
+  try {
+    const userId = req.user.userId; 
+
+    // Update is_active menjadi FALSE
+    await authModel.updateUserActiveStatus(userId, false);
+
+    return res.status(200).json({ 
+      success: true, 
+      message: "Logout berhasil" 
+    });
+  } catch (error) {
+    console.error("Error pada auth /api/v1/auth/logout : ", error);
+    next(error);
+  }
+};
+
+module.exports = {
+  login,
+  getMe,
+  logout,
+};

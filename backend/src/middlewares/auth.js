@@ -24,10 +24,17 @@ const verifyToken = (req, res, next) => {
         });
     }
 
+    // DEBUG
+    // console.log(authHeader);
+
+    
     // Ekstrak token
     const token = authHeader.startsWith('Bearer ') 
         ? authHeader.split(' ')[1] 
         : authHeader;
+
+    // DEBUG
+    // console.log(token);
 
     if (!token || token === 'undefined' || token === 'null') {
         return res.status(401).json({
