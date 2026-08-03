@@ -27,6 +27,8 @@ function Login(){
             });
             localStorage.setItem("token", response.data.token);
             localStorage.setItem("user", JSON.stringify(response.data.user));
+
+            navigate("/dashboard");
         } catch (err){
             const msg =
             err.response?.data?.message || (isLogin ? "Login Gagal" : "Login Gagal")
