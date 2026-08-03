@@ -23,7 +23,6 @@ router.delete('/:id', verifyToken, verifyRole(['admin','staff']), cancelReservat
 // Endpoint reservation_rooms
 // check in check out
 const reservationRoomRoutes = require('./reservationRoomRoutes');
-const { cancelReservation } = require("../models/reservationModel");
 router.use('/:id/rooms', reservationRoomRoutes);
 
 module.exports = router;
