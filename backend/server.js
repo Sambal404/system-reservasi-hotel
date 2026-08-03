@@ -46,7 +46,7 @@ app.use('/api/v1/reservations', reservationRoutes);
 
 
 // Global Error Handler
-app.use(( err, req, next ) => {
+app.use(( err, req, res, next ) => {
   console.log(err);
   res
     .status( err.status || 500 )
