@@ -27,7 +27,7 @@ const guestModel = {
         query += ' ORDER BY id DESC LIMIT ? OFFSET ?';
         params.push(Number(limit), Number(offset));
         
-        const [rows] = await db.execute(query, params);
+        const [rows] = await db.query(query, params);
         const [statsResult] = await db.execute(statsQuery);
         
         const { total = 0, male = 0, female = 0 } = statsResult[0] || {};

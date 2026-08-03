@@ -32,15 +32,15 @@ app.use(express.json());
 // == API V1 ==
 // ============
 // Auth Routes
-app.use('/api/v1/auth', authRoutes);
+app.use('/api/auth', authRoutes);
 // Dashboard Routes
-app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 // Guests Routes
-app.use('/api/v1/guests', guestRoutes);
+app.use('/api/guests', guestRoutes);
 // Rooms Routes
-app.use('/api/v1/rooms', roomRoutes);
+app.use('/api/rooms', roomRoutes);
 // Reservations Routes
-app.use('/api/v1/reservations', reservationRoutes);
+app.use('/api/reservations', reservationRoutes);
 // Uers Routes
 // app.use('/api/v1/users', userRoutes);
 

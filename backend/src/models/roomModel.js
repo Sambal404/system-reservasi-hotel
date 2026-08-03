@@ -24,8 +24,8 @@ const roomModel = {
           WHEN MAX(
             CASE 
               WHEN rr.room_status = 'checked_in' 
-                  AND CURDATE() >= rr.check_in_date 
-                  AND CURDATE() < rr.check_out_date THEN 1 
+                  AND ? >= rr.check_in_date 
+                  AND ? < rr.check_out_date THEN 1 
               ELSE 0 
             END
           ) = 1 THEN 'occupied'
@@ -33,8 +33,8 @@ const roomModel = {
           WHEN MAX(
             CASE 
               WHEN rr.room_status = 'booked' 
-                  AND CURDATE() >= rr.check_in_date 
-                  AND CURDATE() < rr.check_out_date THEN 1 
+                  AND ? >= rr.check_in_date 
+                  AND ? < rr.check_out_date THEN 1 
               ELSE 0 
             END
           ) = 1 THEN 'reserved'
@@ -51,7 +51,6 @@ const roomModel = {
     `;
 
     const params = [targetDate, targetDate, targetDate, targetDate];
-
     // Filter Search by room_type
     if (roomTypeId) {
       query += " AND r.room_type_id = ?";
