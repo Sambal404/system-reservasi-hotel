@@ -35,11 +35,11 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 // Dashboard Routes
 app.use('/api/dashboard', dashboardRoutes);
-// Guests Routes
-app.use('/api/guests', guestRoutes);
-// Rooms Routes
+// Guests routes
+app.use("/api/guests", guestRoutes);
+// Room routes
 app.use('/api/rooms', roomRoutes);
-// Reservations Routes
+// Reservation routes
 app.use('/api/reservations', reservationRoutes);
 // Uers Routes
 // app.use('/api/v1/users', userRoutes);
