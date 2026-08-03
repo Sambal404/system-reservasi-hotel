@@ -25,8 +25,8 @@ function Login(){
                 username: form.username,
                 password: form.password,
             });
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("user", JSON.stringify(response.data.user));
+            localStorage.setItem("token", response.data.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.data.user));
 
             navigate("/dashboard");
         } catch (err){

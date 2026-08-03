@@ -7,8 +7,8 @@ const pool = require('../config/db');
 const getGuest = async (req, res, next) =>{
     try {
         const { search } = req.query;
-        const page = parseInt(req.query.page, 10) ?? 1;
-        const limit = parseInt(req.query.limit, 10) ?? 20;
+        const page = parseInt(req.query.page, 10) || 1;
+        const limit = parseInt(req.query.limit, 10) || 20;
         const offset = (page -1) * limit;
 
         const { rows, total, male, female } = await guestModel.getAllGuests({
