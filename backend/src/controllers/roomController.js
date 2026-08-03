@@ -85,9 +85,45 @@ const getRoomById = async (req, res, next) => {
   }
 };
 
+// GET /api/rooms/check-availability?
+const checkRoomAvailability = async (req, res, next) => {
+    try {
+        const { roomTypeId, checkInDate, checkOutDate, quantity } = req.query;
+
+        if (!roomTypeId || !checkInDate || !checkOutDate) {
+            return res.status(400).json({
+                success: false,
+                message: "Parameter roomTypeId, checkInDate, dan checkOutDate wajib disertakan dalam query."
+            });
+        }
+
+        const qty = quantity ? parseInt(quantity, 10) : 1;
+
+        const availabilityInfo = await roomModel.checkRoomTypeAvailability(
+            roomTypeId, 
+            checkInDate, 
+            checkOutDate, 
+            qty
+        );
+
+        return res.status(200).json({
+            success: true,
+            message: availabilityInfo.available 
+                ? "Kamar tersedia untuk dipesan." 
+                : "Mohon maaf, ketersediaan kamar tidak mencukupi.",
+            data: availabilityInfo
+        });
+
+    } catch (err) {
+        console.error("Error pada checkRoomAvailability:", err);
+        next(err);
+    }
+};
+
 module.exports = {
   getAllRooms,
   getAvailableRooms,
   getAvailableRoomsToday,
-  getRoomById
+  getRoomById,
+  checkRoomAvailability
 };

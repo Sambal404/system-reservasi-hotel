@@ -22,7 +22,7 @@ const getAllReservations = async (req, res, next) => {
     const limit = parseInt(req.query.limit, 10) || 20;
     const offset = (page - 1) * limit;
 
-    const result = await reservationModel.getReservations({
+    const result = await reservationModel.getAllReservations({
       search,
       status,
       limit,
@@ -55,6 +55,7 @@ const createReservation = async (req, res, next) => {
       data: { reservation_id: newReservationId }
     });
   } catch (error) {
+    console.log("Error pada createReservation:", error);
     next(error);
   }
 };
@@ -64,7 +65,7 @@ const createReservation = async (req, res, next) => {
 const getReservationById = async (req, res, next) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const reservation = await reservationModel.getReservation(id);
+    const reservation = await reservationModel.getReservationById(id);
     
     if (!reservation) {
         return res.status(404).json({ success: false, message: "Reservasi tidak ditemukan." });
@@ -72,6 +73,7 @@ const getReservationById = async (req, res, next) => {
 
     return res.status(200).json({ success: true, data: reservation });
   } catch (error) {
+    console.log('Error pada getReservationById', error);
     next(error);
   }
 };
@@ -94,6 +96,7 @@ const updateGuestOfReservation = async (req, res, next) => {
 
     return res.status(200).json({ success: true, message: "Penanggung jawab (Guest) reservasi berhasil diubah." });
   } catch (error) {
+    console.log("Error pada updateGuestForReservation", error);
     next(error);
   }
 };
