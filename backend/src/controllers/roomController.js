@@ -50,7 +50,7 @@ const getAvailableRoomsToday = async (req, res, next) => {
   try {
     const { roomTypeId } = req.query;
 
-    const availableRoomsToday = await getAvailableRoomsTodayFast({ roomTypeId });
+    const availableRoomsToday = await roomModel.getAvailableRoomsToday({ roomTypeId });
 
     return res.status(200).json({
       success: true,

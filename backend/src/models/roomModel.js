@@ -58,12 +58,6 @@ const roomModel = {
       params.push(roomTypeId);
     }
 
-    // Filter by clean_status
-    if (cleanStatus) {
-      query += " AND r.clean_status = ?";
-      params.push(cleanStatus);
-    }
-
     // Search by room_number
     if (search) {
       query += " AND (r.room_number LIKE ? OR rt.name LIKE ?)";

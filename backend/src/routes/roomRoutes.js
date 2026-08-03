@@ -12,7 +12,7 @@ const { verifyToken, verifyRole } = require('../middlewares/auth');
 
 
 router.get("/", verifyToken, getAllRooms);
-router.get("/:id", verifyToken, getRoomById);
+router.get("/by/:id", verifyToken, getRoomById);
 router.get('/available', verifyToken, getAvailableRooms);
 router.get('/available-today', verifyToken, getAvailableRoomsToday);
 
