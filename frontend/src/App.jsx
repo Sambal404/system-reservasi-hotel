@@ -1,7 +1,7 @@
 // src/App.jsx
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import SideBar from "./components/SideBar";
-import TopBar from "./components/TopBar";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+// import SideBar from "./components/SideBar";
+// import TopBar from "./components/TopBar";
 
 //components
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -23,9 +23,11 @@ export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
 
         <Route element={<ProtectedRoute />}>
+          {/* Root / Direct to Dashboard */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} /> 
           <Route element={<Layout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/rooms" element={<Rooms />} />
