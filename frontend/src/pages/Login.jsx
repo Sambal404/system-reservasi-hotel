@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function Login(){
     const navigate = useNavigate();
@@ -25,8 +26,9 @@ function Login(){
                 username: form.username,
                 password: form.password,
             });
-            localStorage.setItem("token", response.data.token);
-            localStorage.setItem("user", JSON.stringify(response.data.user));
+            console.log("Login response", response.data)
+            localStorage.setItem("token", response.data.data.token);
+            localStorage.setItem("user", JSON.stringify(response.data.data.user));
 
             navigate("/dashboard");
         } catch (err){
