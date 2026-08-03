@@ -2,6 +2,8 @@
 --  DATABASE HOTEL ===
 -- =============== ===
 
+DROP DATABASE IF EXISTS hotel_db;
+
 CREATE DATABASE IF NOT EXISTS hotel_db;
 USE hotel_db;
 
