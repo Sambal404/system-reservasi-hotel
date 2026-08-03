@@ -6,7 +6,8 @@ const {
     getAllRooms, 
     getRoomById, 
     getAvailableRooms, 
-    getAvailableRoomsToday 
+    getAvailableRoomsToday,
+    checkRoomAvailability
 } = require("../controllers/roomController");
 const { verifyToken, verifyRole } = require('../middlewares/auth');
 
@@ -15,5 +16,6 @@ router.get("/", verifyToken, getAllRooms);
 router.get("/by/:id", verifyToken, getRoomById);
 router.get('/available', verifyToken, getAvailableRooms);
 router.get('/available-today', verifyToken, getAvailableRoomsToday);
+router.get('/check-availability', verifyToken, checkRoomAvailability);
 
 module.exports = router;
