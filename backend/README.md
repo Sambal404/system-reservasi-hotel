@@ -162,3 +162,36 @@ Base URL: `http://localhost:3000/api`
 ```
 
 ```
+
+## 🚀 Next Updates (Akan Datang)
+
+### 7. 💳 Payments (`/payments`)
+
+| Method | Endpoint | Kegunaan | Butuh Auth? | Akses Role | Contoh Input / Keterangan |
+| --- | --- | --- | --- | --- | --- |
+| `GET` | `/payments` | Melihat riwayat seluruh transaksi pembayaran | ✅ Ya | Semua Staff | `Query Params`: `?startDate=2026-08-01&endDate=2026-08-03&status=completed` |
+| `POST` | `/payments` | Melakukan pembayaran/pelunasan atas suatu reservasi | ✅ Ya | Admin / Staff | `Body JSON`: `{ "reservation_id": 1, "amount": 750000, "payment_method": "cash", "payment_type": "full" }` |
+| `GET` | `/payments/:id` | Melihat detail struk/transaksi pembayaran tertentu | ✅ Ya | Semua Staff | `Params URL`: `/api/payments/1` |
+| `POST` | `/payments/:id/refund` | Memproses pengembalian dana (refund) pembayaran | ✅ Ya | Admin | `Body JSON`: `{ "amount": 250000, "reason": "Tamu batal menginap sebagian" }` |
+
+### 8. 👤 Users / Employees (`/users`)
+
+| Method | Endpoint | Kegunaan | Butuh Auth? | Akses Role | Contoh Input / Keterangan |
+| --- | --- | --- | --- | --- | --- |
+| `GET` | `/users` | Melihat daftar akun staff/karyawan hotel | ✅ Ya | Admin | `Query Params`: `?role=staff&status=active` |
+| `POST` | `/users` | Mendaftarkan akun login baru untuk karyawan | ✅ Ya | Admin | `Body JSON`: `{ "employee_id": 3, "username": "resep_budi", "password": "securepassword", "is_active": true }` |
+| `GET` | `/users/:id` | Mengambil detail informasi akun user berdasarkan ID | ✅ Ya | Admin | `Params URL`: `/api/users/1` |
+| `PUT` | `/users/:id` | Memperbarui data akun (status aktif, reset password) | ✅ Ya | Admin | `Body JSON`: `{ "is_active": false }` |
+| `DELETE` | `/users/:id` | Menghapus akun pengguna dari sistem | ✅ Ya | Admin | `Params URL`: `/api/users/1` |
+
+### 9. 📈 Reports (`/reports`)
+
+| Method | Endpoint | Kegunaan | Butuh Auth? | Akses Role | Contoh Input / Keterangan |
+| --- | --- | --- | --- | --- | --- |
+| `GET` | `/reports/revenue` | Laporan ringkasan pendapatan (harian/bulanan) | ✅ Ya | Admin / Manager | `Query Params`: `?startDate=2026-08-01&endDate=2026-08-31` |
+| `GET` | `/reports/occupancy` | Laporan tingkat keterisian kamar hotel (Occupancy Rate) | ✅ Ya | Admin / Manager | `Query Params`: `?month=08&year=2026` |
+| `GET` | `/reports/audit-trail` | Laporan rekam jejak aktivitas kasir/transaksi penting | ✅ Ya | Admin | `Query Params`: `?userId=2&date=2026-08-03` |
+
+```
+
+```
